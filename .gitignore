@@ -1,0 +1,4 @@
+*.sw?
+.build/
+.vscode/
+Examples/FireBaseUI/Resources/google-services-desktop.json

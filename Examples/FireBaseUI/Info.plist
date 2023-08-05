@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>org.compnerd.SwiftFirebase.FireBaseUI</string>
+  <key>ApplicationSceneManifest</key>
+  <dict>
+    <key>ApplicationSupportsMultipleScenes</key>
+    <false/>
+    <key>SceneConfigurations</key>
+    <dict>
+    <key>UIWindowSceneSessionRoleApplication</key>
+    <array>
+      <dict>
+        <key>SceneConfigurationName</key>
+        <string>Default Configuration</string>
+        <key>SceneDelegateClassName</key>
+        <string>FireBaseUI.SceneDelegate</string>
+      </dict>
+    </array>
+    </dict>
+  </dict>
+</dict>
+</plist>

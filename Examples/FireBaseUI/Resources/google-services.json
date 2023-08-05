@@ -1,0 +1,20 @@
+{
+  "project_info": {
+    "project_id": "test-do-not-use",
+    "firebase_url": "https://test-do-not-use.firebaseio.com",
+    "storage_bucket": "test-do-not-use.firebaseio.com"
+  },
+  "client": [
+    {
+      "api_key": [
+        { "current_key": "000000000000000000000000000000000000000" }
+      ],
+      "client_info": {
+        "mobilesdk_app_id": "1:999999999999:ios:0000000000000000",
+        "android_client_info": {
+          "package_name": "com.firebaseio.test-do-not-use"
+        }
+      }
+    }
+  ]
+}

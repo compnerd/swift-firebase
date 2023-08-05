@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: BSD-3-Clause
+
+module firebase [system] {
+  requires cplusplus
+
+  module app {
+    header "FirebaseApp.hh"
+    export *
+    link "firebase_app"
+  }
+
+  module auth {
+    header "FirebaseAuth.hh"
+    export *
+    link "firebase_auth"
+  }
+
+  module core {
+    header "FirebaseCore.hh"
+    export *
+  }
+
+  module logging {
+    header "FirebaseLogging.hh"
+    export *
+  }
+}

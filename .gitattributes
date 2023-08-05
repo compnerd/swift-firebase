@@ -1,0 +1,6 @@
+.gitattributes eol=lf
+.gitignore eol=lf
+*.hh eol=lf
+*.json eol=lf
+*.plist eol=lf
+*.swift eol=lf

@@ -1,0 +1,15 @@
+Name: firebase
+Enumerators:
+  - Name: kLogLevelVerbose
+    SwiftName: verbose
+  - Name: kLogLevelDebug
+    SwiftName: debug
+  - Name: kLogLevelInfo
+    SwiftName: info
+  - Name: kLogLevelWarning
+    SwiftName: warning
+  - Name: kLogLevelError
+    SwiftName: error
+  - Name: kLogLevelAssert
+    SwiftName: assert
+

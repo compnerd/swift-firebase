@@ -1,0 +1,126 @@
+From 140b2a4d33c50deca8a1ab9284f1897c07a1ce52 Mon Sep 17 00:00:00 2001
+From: Saleem Abdulrasool <compnerd@compnerd.org>
+Date: Thu, 3 Aug 2023 21:40:01 -0700
+Subject: [PATCH] Add a couple of workarounds for Swift on Windows
+
+The C++ Interop efforts in Swift currently have some limitations.  In
+particular, it cannot support trivial types with non-trivial
+destructors.  As a workaround, provide a copy constructor which can be
+used by the Swift interop while using the regular semantics for all
+other cases.
+
+A second issue arises in the handling of futures.  Unfortunately, it is
+not currently possible to pass an indirect block parameter which
+prevents the construction of a callback.  Workaround this by providing
+an inline shim to use a direct parameter (i.e. indirect value through a
+pointer) which then allows a callback to be formed.
+
+Both of these items are being tracked upstream but seem to be
+potentially sufficient to enable the use of Swift for using the C++ SDK
+for desktop scenarios.
+---
+ app/src/include/firebase/future.h | 15 +++++++++++++++
+ auth/CMakeLists.txt               |  1 +
+ auth/src/auth_swift.cc            | 26 ++++++++++++++++++++++++++
+ auth/src/include/firebase/auth.h  |  7 +++++++
+ 4 files changed, 49 insertions(+)
+ create mode 100644 auth/src/auth_swift.cc
+
+diff --git a/app/src/include/firebase/future.h b/app/src/include/firebase/future.h
+index 0d09fc07..9e325e3d 100644
+--- a/app/src/include/firebase/future.h
++++ b/app/src/include/firebase/future.h
+@@ -407,6 +407,11 @@ class Future : public FutureBase {
+   /// when you set up the callback.
+   typedef void (*TypedCompletionCallback)(const Future<ResultType>& result_data,
+                                           void* user_data);
++#if defined(__swift__)
++  // TODO(apple/swift#67662) indirect block parameters are unsupported
++  typedef void (*TypedCompletionCallback_SwiftWorkaround)(const Future<ResultType>* result_data,
++                                                          void* user_data);
++#endif
+ 
+   /// Construct a future.
+   Future() {}
+@@ -464,6 +469,16 @@ class Future : public FutureBase {
+   inline void OnCompletion(TypedCompletionCallback callback,
+                            void* user_data) const;
+ 
++#if defined(__swift__)
++  // TODO(apple/swift#67662) indirect block parameters are unsupported
++  inline void OnCompletion_SwiftWorkaround(TypedCompletionCallback_SwiftWorkaround callback,
++                                           void *user_data) const {
++    OnCompletion([callback, user_data](const Future<ResultType>& future) {
++      callback(&future, user_data);
++    });
++  }
++#endif
++
+ #if defined(FIREBASE_USE_STD_FUNCTION) || defined(DOXYGEN)
+   /// Register a single callback that will be called at most once, when the
+   /// future is completed.
+diff --git a/auth/CMakeLists.txt b/auth/CMakeLists.txt
+index 2dc7c4e2..8ee2a964 100644
+--- a/auth/CMakeLists.txt
++++ b/auth/CMakeLists.txt
+@@ -51,6 +51,7 @@ build_flatbuffers("${flatbuffer_schemas}"
+ # Common source files used by all platforms
+ set(common_SRCS
+     src/auth.cc
++    src/auth_swift.cc
+     src/credential.cc
+     src/common.cc
+     src/common.h
+diff --git a/auth/src/auth_swift.cc b/auth/src/auth_swift.cc
+new file mode 100644
+index 00000000..63248c18
+--- /dev/null
++++ b/auth/src/auth_swift.cc
+@@ -0,0 +1,26 @@
++/*
++ * Copyright 2016 Google LLC
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#define __swift__
++#include "auth/src/include/firebase/auth.h"
++
++#if FIREBASE_PLATFORM_WINDOWS
++namespace firebase {
++namespace auth {
++Auth::Auth(const Auth &) noexcept = default;
++}
++}
++#endif
+diff --git a/auth/src/include/firebase/auth.h b/auth/src/include/firebase/auth.h
+index bec3ce8f..71bdaa12 100644
+--- a/auth/src/include/firebase/auth.h
++++ b/auth/src/include/firebase/auth.h
+@@ -147,6 +147,13 @@ class Auth {
+ 
+   ~Auth();
+ 
++#if defined(__swift__)
++#if FIREBASE_PLATFORM_WINDOWS
++  // TODO(apple/swift#67288) support trivial C++ types with non-trivial dtors
++  Auth(const Auth &) noexcept;
++#endif
++#endif
++
+   /// Synchronously gets the cached current user, or returns an object where
+   /// is_valid() == false if there is none.
+   ///
+-- 
+2.39.2.windows.1
+
