@@ -4,27 +4,17 @@ import firebase
 
 public typealias FirebaseLoggerLevel = firebase.LogLevel
 
-// Workaround #67604 - Unable to import C++ enumerations
 extension firebase.LogLevel {
-  public static var kLogLevelVerbose: Self { .init(0) }
-  public static var kLogLevelDebug: Self { .init(1) }
-  public static var kLogLevelInfo: Self { .init(2) }
-  public static var kLogLevelWarning: Self { .init(3) }
-  public static var kLogLevelError: Self { .init(4) }
-  public static var kLogLevelAssert: Self { .init(5) }
+  public static var verbose: Self { firebase.kLogLevelVerbose }
+  public static var debug: Self { firebase.kLogLevelDebug }
+  public static var info: Self { firebase.kLogLevelInfo }
+  public static var warning: Self { firebase.kLogLevelWarning }
+  public static var error: Self { firebase.kLogLevelError }
+  public static var assert: Self { firebase.kLogLevelAssert }
 }
 
 extension firebase.LogLevel {
-  public static var verbose: Self { kLogLevelVerbose }
-  public static var debug: Self { kLogLevelDebug }
-  public static var info: Self { kLogLevelInfo }
-  public static var warning: Self { kLogLevelWarning }
-  public static var error: Self { kLogLevelError }
-  public static var assert: Self { kLogLevelAssert }
-}
-
-extension firebase.LogLevel {
-  public static var min: Self { .error } 
+  public static var min: Self { .error }
   public static var max: Self { .debug }
 }
 
