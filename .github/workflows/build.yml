@@ -16,7 +16,7 @@ jobs:
         include:
           - branch: development
             tag: DEVELOPMENT-SNAPSHOT-2023-08-10-a
-            options: ''
+            options: -Xswiftc "-I${env:SDKROOT}\usr\lib\swift_static\windows"
 
     name: Swift ${{ matrix.tag }}
 
