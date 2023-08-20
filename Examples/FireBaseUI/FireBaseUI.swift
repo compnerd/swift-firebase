@@ -3,7 +3,6 @@
 import SwiftWin32
 import Foundation
 
-import firebase
 import FirebaseCore
 import FirebaseAuth
 

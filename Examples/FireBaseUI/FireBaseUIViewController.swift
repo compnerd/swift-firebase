@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-import firebase
 import FirebaseCore
 import FirebaseAuth
 import SwiftWin32

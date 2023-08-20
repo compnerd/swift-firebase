@@ -3,6 +3,7 @@
 import CxxStdlib
 import Foundation
 
+@_exported
 import firebase
 import FirebaseCore
 
