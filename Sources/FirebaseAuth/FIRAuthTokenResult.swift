@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
+@_exported
 import firebase
 
 import Foundation
