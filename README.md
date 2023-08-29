@@ -20,6 +20,8 @@ As of 2023-08-10, the Firebase SDK requires some changes to support the Swift/C+
 
 ### Building
 
+#### SwiftPM
+
 Assuming a build of firebase is available in the top level under `third_party\firebase-development\usr`, the package should build as a standard SPM package using:
 ```powershell
 swift build
@@ -31,4 +33,16 @@ swift build --product FireBaseUI
 copy Examples\FireBaseUI\Info.plist .build\debug\
 copy Examples\FireBaseUI\FireBaseUI.exe.manifest .build\debug\
 swift run
+```
+
+#### CMake
+
+Assuming a build of firebase is available in the top level under `third_party\firebase-development\usr`, the package should build as a standard CMake package using:
+```powershell
+cmake -B out -G Ninja -S .
+```
+
+You should be able to run the demo application subsequently by just launching it as:
+```powershell
+.\out\bin\FireBaseUI.exe
 ```
