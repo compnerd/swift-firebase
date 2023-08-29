@@ -9,8 +9,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_Swift_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/swift)
 
-# include_directories($<$<COMPILE_LANGUAGE:Swift>:${CMAKE_Swift_MODULE_DIRECTORY}>)
-
 include(FetchContent)
 
 add_library(firebase INTERFACE)
