@@ -4,7 +4,8 @@ public struct FirebaseError: Error {
   public let code: CInt
   public let message: String
 
-  package init(code: CInt, message: String) {
+  @_spi(Error)
+  public init(code: CInt, message: String) {
     self.code = code
     self.message = message
   }
