@@ -14,8 +14,8 @@ As of 2023-08-10, the Firebase SDK requires some changes to support the Swift/C+
 
 0. Make sure you have the right Swift toolchain installed, currently this repo requires at least https://download.swift.org/development/windows10/swift-DEVELOPMENT-SNAPSHOT-2023-08-12-a/swift-DEVELOPMENT-SNAPSHOT-2023-08-12-a-windows10.exe to build.
 1. Download the lastest build of the Firebase C++ SDK from https://github.com/thebrowsercompany/firebase-cpp-sdk/tags
-2. Run `mkdir third_party\firebase-development` to create the folder where we will extract the Firebase C++ SDK release that was just downloaded
-3. Extract the Firebase C++ SDK release into the `third_party\firebase-development` folder that was just created.
+2. Run `md third_party\firebase-development` to create the directory where we will extract the Firebase C++ SDK release that was just downloaded
+3. Extract the Firebase C++ SDK release into the `third_party\firebase-development` directory that was just created.
 4. Modify the `Examples\FireBaseUI\Resources\google-services.json` file to include the correct values from Firebase.
 
 ### Building
