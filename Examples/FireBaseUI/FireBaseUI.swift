@@ -8,7 +8,11 @@ import FirebaseAuth
 
 extension Foundation.Bundle {
   internal static var resources: URL {
+#if SWIFT_PACKAGE
     Bundle.module.bundleURL.appendingPathComponent("Resources")
+#else
+    Bundle.main.bundleURL.appendingPathComponent("Resources")
+#endif
   }
 }
 
