@@ -5,6 +5,7 @@ import Foundation
 
 @_exported
 import firebase
+@_spi(Error)
 import FirebaseCore
 
 public typealias User = firebase.auth.User
