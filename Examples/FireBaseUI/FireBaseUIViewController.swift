@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 import FirebaseCore
+import FirebaseFirestore
 import FirebaseAuth
 import SwiftWin32
 
@@ -34,6 +35,24 @@ extension FireBaseLogLevelPickerHandler: PickerViewDelegate {
 
 // MARK: - FireBaseUIViewController
 
+extension Rect {
+  var maxY: Double {
+    origin.y + size.height
+  }
+
+  var minY: Double {
+    origin.y
+  }
+
+  var minX: Double {
+    origin.x
+  }
+
+  var maxX: Double {
+    origin.x + size.width
+  }
+}
+
 internal final class FireBaseUIViewController: ViewController {
   fileprivate let firebaseLogHandler = FireBaseLogLevelPickerHandler()
 
@@ -54,6 +73,13 @@ internal final class FireBaseUIViewController: ViewController {
                          title: "Verify Email")
   var btnReset = Button(frame: Rect(x: 256, y: 324, width: 156, height: 32),
                         title: "Reset Password")
+
+  lazy var fetchUserDocumentButton: Button = {
+    return Button(
+      frame: .init(x: btnReset.frame.maxX, y: btnReset.frame.minY, width: 100, height: 32),
+      title: "Get User"
+    )
+  }()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -114,6 +140,8 @@ internal final class FireBaseUIViewController: ViewController {
     btnReset.addTarget(self, action: FireBaseUIViewController.resetPassword,
                        for: .primaryActionTriggered)
     self.view?.addSubview(btnReset)
+
+    view?.addSubview(fetchUserDocumentButton)
   }
 
   private func signIn() {
@@ -124,7 +152,11 @@ internal final class FireBaseUIViewController: ViewController {
 
     Task {
       do {
-        _ = try await Auth.auth().signIn(withEmail: email, password: password)
+        let result = try await Auth.auth().signIn(withEmail: email, password: password)
+        if let user = result.user {
+          let document = Firestore.firestore().document("users/\(user.uid)")
+          print("Made a document: \(document.path)")
+        }
       } catch {
         print("Error signing in: \(error.localizedDescription)")
       }
