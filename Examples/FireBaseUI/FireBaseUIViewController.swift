@@ -83,6 +83,12 @@ internal final class FireBaseUIViewController: ViewController {
     Label(frame: .init(x: btnCreate.frame.minX, y: btnReset.frame.maxY, width: view.frame.width - 16, height: 400))
   }()
 
+  var currentListener: ListenerRegistration? {
+    didSet {
+      oldValue?.remove()
+    }
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     self.title = "FireBase UI"
@@ -245,9 +251,14 @@ internal final class FireBaseUIViewController: ViewController {
             .collection("users")
             .document(user.uid)
         let snapshot = try await document.get()
+
         await MainActor.run { [weak self] in
           guard let self else { return }
           userDetailsLabel.text = snapshot.debugDescription
+          self.currentListener = document.addSnapshotListener { [weak self] newSnapshot, error, info in
+            guard let self else { return }
+            userDetailsLabel.text = newSnapshot.debugDescription
+          }
         }
       } catch {
         print("Error fetching snapshot: \(error)")
