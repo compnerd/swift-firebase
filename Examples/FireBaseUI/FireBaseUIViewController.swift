@@ -245,7 +245,7 @@ internal final class FireBaseUIViewController: ViewController {
 
     Task {
       do {
-        let firestore = try await Firestore.firestore()
+        let firestore = Firestore.firestore()
         let document = firestore
           .collection("users")
           .document(user.uid)
