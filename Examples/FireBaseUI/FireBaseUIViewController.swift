@@ -236,12 +236,12 @@ internal final class FireBaseUIViewController: ViewController {
     }
 
     Task {
-      let document = Firestore.firestore()
+      do {
+        let document = try await Firestore.firestore()
         .collection("users")
         .document(user.uid)
-      print("Made a document: \(String(reflecting: document))")
-      Firestore.firestore().printSettings()
-      do {
+        print("Made a document: \(String(reflecting: document))")
+        try await Firestore.firestore().printSettings()
         let snapshot = try await document.get()
         print("Got snapshot: \(snapshot)")
       } catch {
