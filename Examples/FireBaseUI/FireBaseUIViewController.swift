@@ -141,6 +141,11 @@ internal final class FireBaseUIViewController: ViewController {
                        for: .primaryActionTriggered)
     self.view?.addSubview(btnReset)
 
+    fetchUserDocumentButton.addTarget(
+      self,
+      action: FireBaseUIViewController.fetchUserDocument,
+      for: .primaryActionTriggered
+    )
     view?.addSubview(fetchUserDocumentButton)
   }
 
@@ -152,11 +157,7 @@ internal final class FireBaseUIViewController: ViewController {
 
     Task {
       do {
-        let result = try await Auth.auth().signIn(withEmail: email, password: password)
-        if let user = result.user {
-          let document = Firestore.firestore().document("users/\(user.uid)")
-          print("Made a document: \(document.path)")
-        }
+        _ = try await Auth.auth().signIn(withEmail: email, password: password)
       } catch {
         print("Error signing in: \(error.localizedDescription)")
       }
@@ -226,5 +227,27 @@ internal final class FireBaseUIViewController: ViewController {
         print("Error sending password reset: \(error.localizedDescription)")
       }
     }
+  }
+
+  private func fetchUserDocument() {
+    guard let user = Auth.auth().currentUser else {
+      print("No current user, can't fetch document...")
+      return
+    }
+
+    Task {
+      let document = Firestore.firestore()
+        .collection("users")
+        .document(user.uid)
+      print("Made a document: \(String(reflecting: document))")
+      Firestore.firestore().printSettings()
+      do {
+        let snapshot = try await document.get()
+        print("Got snapshot: \(snapshot)")
+      } catch {
+        print("Error fetching snapshot: \(error)")
+      }
+    }
+
   }
 }
