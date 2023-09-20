@@ -4,38 +4,30 @@
 
 #include <firebase/firestore.h>
 
+using namespace ::firebase::firestore;
+
 // Functions defined in this namespace are used to get around the lack of
 // virtual function support currently in Swift. As that support changes
 // these functions will go away whenever possible.
-using namespace ::firebase::firestore;
-
 namespace swift_firebase::swift_cxx_shims::firebase::firestore {
-
 inline Settings
-firestore_settings(const Firestore firestore) {
-  return firestore.settings();
+firestore_settings(Firestore* firestore) {
+  return firestore->settings();
 }
 
 inline DocumentReference
-firestore_document(const Firestore firestore, ::std::string document_path) {
-  return firestore.Document(
+firestore_document(Firestore* firestore, const ::std::string document_path) {
+  return firestore->Document(
     document_path
   );
 }
 
 inline CollectionReference
-firestore_collection(const Firestore firestore, ::std::string collection_path) {
-  return firestore.Collection(collection_path);
+firestore_collection(Firestore* firestore, const ::std::string collection_path) {
+  return firestore->Collection(collection_path);
 }
 
-/**
- * @brief Get the Firestore instance from a given Document
- *
- * @param[in] document The document from which the Firestore instance should be extracted from.
- *
- * @return A pointer to the Firestore instance the passed in Document is in.
-*/
-inline Firestore *
+inline Firestore*
 document_firestore(DocumentReference document) {
   return document.firestore();
 }
@@ -61,6 +53,6 @@ collection_document(CollectionReference collection, std::string document_path) {
     document_path
   );
 }
-}
+} // swift_firebase::swift_cxx_shims::firebase::firestore
 
 #endif

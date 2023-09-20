@@ -81,6 +81,10 @@ internal final class FireBaseUIViewController: ViewController {
     )
   }()
 
+  lazy var userDetailsLabel = {
+    Label(frame: .init(x: btnCreate.frame.minX, y: btnReset.frame.maxY, width: view.frame.width - 16, height: 400))
+  }()
+
   override func viewDidLoad() {
     super.viewDidLoad()
     self.title = "FireBase UI"
@@ -146,7 +150,11 @@ internal final class FireBaseUIViewController: ViewController {
       action: FireBaseUIViewController.fetchUserDocument,
       for: .primaryActionTriggered
     )
+
+    userDetailsLabel.text = "No User Data Fetched"
+
     view?.addSubview(fetchUserDocumentButton)
+    view?.addSubview(userDetailsLabel)
   }
 
   private func signIn() {
@@ -237,17 +245,18 @@ internal final class FireBaseUIViewController: ViewController {
 
     Task {
       do {
-        let document = try await Firestore.firestore()
-        .collection("users")
-        .document(user.uid)
-        print("Made a document: \(String(reflecting: document))")
-        try await Firestore.firestore().printSettings()
+        let firestore = try await Firestore.firestore()
+        let document = firestore
+          .collection("users")
+          .document(user.uid)
         let snapshot = try await document.get()
-        print("Got snapshot: \(snapshot)")
+        await MainActor.run { [weak self] in
+          guard let self else { return }
+          userDetailsLabel.text = snapshot.debugDescription
+        }
       } catch {
         print("Error fetching snapshot: \(error)")
       }
     }
-
   }
 }

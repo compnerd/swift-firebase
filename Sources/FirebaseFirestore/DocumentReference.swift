@@ -46,3 +46,9 @@ extension DocumentReference: CustomDebugStringConvertible {
     String(self.ToString())
   }
 }
+
+extension DocumentSnapshot: CustomDebugStringConvertible {
+  public var debugDescription: String {
+    String(self.ToString())
+  }
+}

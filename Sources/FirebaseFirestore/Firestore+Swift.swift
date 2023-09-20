@@ -20,20 +20,16 @@ extension Firestore {
   }
 
   public static func firestore(app: FirebaseApp) async throws -> Firestore {
-    var result: firebase.InitResult = .init(rawValue: 12)
-
     var firestore: Firestore?
-
-    var functions: [firebase.ModuleInitializer.InitializerFn?] = [
+    let functions: [firebase.ModuleInitializer.InitializerFn?] = [
       { (app, context) in
-        print("We're trying to initialize the Firestore...")
         var result: firebase.InitResult = .init(12)
 
-        guard let instance = firebase.firestore.Firestore.GetInstance(app, &result) else {
-          fatalError("Invalid Firestore Instance, \(result)")
+        //TODO: Figure out how to pass this back into `context` so we don't have to
+        // requery below.
+        guard let _ = firebase.firestore.Firestore.GetInstance(app, &result) else {
+          fatalError("Invalid Firestore Instance")
         }
-
-        print("Initialized the firestore: \(instance), \(result)")
 
         return result
       }
@@ -46,8 +42,10 @@ extension Firestore {
       functions.count
     )
 
+    //TODO: Is this really needed every time we grab our instance? Maybe there's some kind
+    // of initialized value we should be checking?
     typealias Promise = CheckedContinuation<Void, any Error>
-    let myInitializer = try await withCheckedThrowingContinuation { (continuation: Promise) in
+    _ = try await withCheckedThrowingContinuation { (continuation: Promise) in
       withUnsafePointer(to: continuation) { continuation in
         future.OnCompletion_SwiftWorkaround({ future, pvContinuation in
           let pContinuation = pvContinuation?.assumingMemoryBound(to: Promise.self)
@@ -63,27 +61,18 @@ extension Firestore {
       }
     }
 
-    print("Re-querying for firestore...")
     guard let initializedFirestore = firebase.firestore.Firestore.GetInstance(app, nil) else {
-      fatalError("Invalid Firestore Instance, \(result)")
+      fatalError("Invalid Firestore Instance")
     }
 
-    print("returning firestore")
     return initializedFirestore
   }
 
   public func document(_ documentPath: String) -> DocumentReference {
-    let document = swift_firebase.swift_cxx_shims.firebase.firestore.firestore_document(self.pointee, std.string(documentPath))
-    print("retreived document: \(document) - \(documentPath)")
-    return document
+    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_document(self, std.string(documentPath))
   }
 
   public func collection(_ collectionPath: String) -> CollectionReference {
-    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_collection(self.pointee, std.string(collectionPath))
-  }
-
-  public func printSettings() {
-    let settings = swift_firebase.swift_cxx_shims.firebase.firestore.firestore_settings(self.pointee)
-    print("Firestore Settings: \n \(settings)")
+    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_collection(self, std.string(collectionPath))
   }
 }
