@@ -102,7 +102,7 @@ let SwiftFirebase =
                         .linkedLibrary("absl_throw_delegate"),
                         .linkedLibrary("absl_time"),
                         .linkedLibrary("absl_time_zone"),
-                        .linkedLibrary("address_sorting")
+                        .linkedLibrary("address_sorting"),
                         .linkedLibrary("cares"),
                         .linkedLibrary("firestore_core"),
                         .linkedLibrary("firestore_nanopb"),
