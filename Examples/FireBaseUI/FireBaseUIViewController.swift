@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 import FirebaseCore
-import FirebaseFirestore
 import FirebaseAuth
+import FirebaseFirestore
 import SwiftWin32
 
 private final class FireBaseLogLevelPickerHandler {
@@ -35,24 +35,6 @@ extension FireBaseLogLevelPickerHandler: PickerViewDelegate {
 
 // MARK: - FireBaseUIViewController
 
-extension Rect {
-  var maxY: Double {
-    origin.y + size.height
-  }
-
-  var minY: Double {
-    origin.y
-  }
-
-  var minX: Double {
-    origin.x
-  }
-
-  var maxX: Double {
-    origin.x + size.width
-  }
-}
-
 internal final class FireBaseUIViewController: ViewController {
   fileprivate let firebaseLogHandler = FireBaseLogLevelPickerHandler()
 
@@ -74,20 +56,23 @@ internal final class FireBaseUIViewController: ViewController {
   var btnReset = Button(frame: Rect(x: 256, y: 324, width: 156, height: 32),
                         title: "Reset Password")
 
-  lazy var fetchUserDocumentButton: Button = {
-    return Button(frame: .init(x: btnReset.frame.maxX, y: btnReset.frame.minY, width: 100, height: 32),
-                  title: "Get User")
+  let firestoreTestingWindow: Window = {
+    let vc = FirestoreTestingViewController()
+    let window = Window(frame: .init(x: 20, y: 20, width: 450, height: 500))
+    window.rootViewController = vc
+    return window
+  }()
+
+  lazy var firestoreTestingButton: Button = {
+    return Button(
+      frame: .init(x: btnReset.frame.maxX, y: btnReset.frame.minY, width: 200, height: 32),
+      title: "Firestore Testing"
+    )
   }()
 
   lazy var userDetailsLabel = {
     Label(frame: .init(x: btnCreate.frame.minX, y: btnReset.frame.maxY, width: view.frame.width - 16, height: 400))
   }()
-
-  var currentListener: ListenerRegistration? {
-    didSet {
-      oldValue?.remove()
-    }
-  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -149,12 +134,12 @@ internal final class FireBaseUIViewController: ViewController {
                        for: .primaryActionTriggered)
     self.view?.addSubview(btnReset)
 
-    fetchUserDocumentButton.addTarget(self, action: FireBaseUIViewController.fetchUserDocument,
-                                      for: .primaryActionTriggered)
+    firestoreTestingButton.addTarget(self, action: FireBaseUIViewController.showSubscriptionTestingWindow,
+                                     for: .primaryActionTriggered)
 
     userDetailsLabel.text = "No User Data Fetched"
 
-    view?.addSubview(fetchUserDocumentButton)
+    view?.addSubview(firestoreTestingButton)
     view?.addSubview(userDetailsLabel)
   }
 
@@ -232,6 +217,7 @@ internal final class FireBaseUIViewController: ViewController {
     Task {
       do {
         _ = try await Auth.auth().sendPasswordReset(withEmail: email)
+        fetchUserDocument()
       } catch {
         print("Error sending password reset: \(error.localizedDescription)")
       }
@@ -255,14 +241,18 @@ internal final class FireBaseUIViewController: ViewController {
         await MainActor.run { [weak self] in
           guard let self else { return }
           userDetailsLabel.text = snapshot.debugDescription
-          self.currentListener = document.addSnapshotListener { [weak self] newSnapshot, error, info in
-            guard let self else { return }
-            userDetailsLabel.text = newSnapshot.debugDescription
-          }
         }
       } catch {
         print("Error fetching snapshot: \(error)")
       }
     }
+  }
+
+  private func showSubscriptionTestingWindow() {
+    guard let _ = Auth.auth().currentUser else {
+      print("No current user, can't start Firestore testing...")
+      return
+    }
+    firestoreTestingWindow.makeKeyAndVisible()
   }
 }

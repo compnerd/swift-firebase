@@ -62,6 +62,7 @@ FetchContent_MakeAvailable(SwiftWin32)
 add_executable(FireBaseUI
   Examples/FireBaseUI/FireBaseUI.swift
   Examples/FireBaseUI/FireBaseUIViewController.swift
+  Examples/FireBaseUI/FirestoreTestingViewController.swift
   Examples/FireBaseUI/SceneDelegate.swift
   Examples/FireBaseUI/SwiftWin32+Extensions.swift)
 target_compile_options(FireBaseUI PRIVATE
