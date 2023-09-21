@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-3-Clause
+
 @_exported
 import firebase
 @_spi(Error)
@@ -11,11 +13,11 @@ public typealias DocumentSnapshot = firebase.firestore.DocumentSnapshot
 
 extension DocumentReference {
   public var firestore: Firestore {
-    return swift_firebase.swift_cxx_shims.firebase.firestore.document_firestore(self)!
+    swift_firebase.swift_cxx_shims.firebase.firestore.document_firestore(self)!
   }
 
   public var path: String {
-    return String(swift_firebase.swift_cxx_shims.firebase.firestore.document_path(self))
+    String(swift_firebase.swift_cxx_shims.firebase.firestore.document_path(self))
   }
 
   public func get() async throws -> DocumentSnapshot {

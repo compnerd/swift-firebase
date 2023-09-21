@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: BSD-3-Clause
 
 #ifndef firebase_include_FirebaseFirestore_hh
 #define firebase_include_FirebaseFirestore_hh
@@ -17,9 +18,7 @@ firestore_settings(Firestore* firestore) {
 
 inline DocumentReference
 firestore_document(Firestore* firestore, const ::std::string document_path) {
-  return firestore->Document(
-    document_path
-  );
+  return firestore->Document(document_path);
 }
 
 inline CollectionReference
@@ -49,9 +48,7 @@ document_get(const DocumentReference document, Source source = Source::kDefault)
 
 inline DocumentReference
 collection_document(CollectionReference collection, std::string document_path) {
-  return collection.Document(
-    document_path
-  );
+  return collection.Document(document_path);
 }
 } // swift_firebase::swift_cxx_shims::firebase::firestore
 
