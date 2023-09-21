@@ -20,11 +20,11 @@ extension Firestore {
   }
 
   public static func firestore(app: FirebaseApp) -> Firestore {
-    guard let initializedFirestore = firebase.firestore.Firestore.GetInstance(app, nil) else {
+    guard let instance = firebase.firestore.Firestore.GetInstance(app, nil) else {
       fatalError("Invalid Firestore Instance")
     }
 
-    return initializedFirestore
+    return instance
   }
 
   public func document(_ documentPath: String) -> DocumentReference {

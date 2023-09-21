@@ -75,10 +75,8 @@ internal final class FireBaseUIViewController: ViewController {
                         title: "Reset Password")
 
   lazy var fetchUserDocumentButton: Button = {
-    return Button(
-      frame: .init(x: btnReset.frame.maxX, y: btnReset.frame.minY, width: 100, height: 32),
-      title: "Get User"
-    )
+    return Button(frame: .init(x: btnReset.frame.maxX, y: btnReset.frame.minY, width: 100, height: 32),
+                  title: "Get User")
   }()
 
   lazy var userDetailsLabel = {
@@ -145,11 +143,8 @@ internal final class FireBaseUIViewController: ViewController {
                        for: .primaryActionTriggered)
     self.view?.addSubview(btnReset)
 
-    fetchUserDocumentButton.addTarget(
-      self,
-      action: FireBaseUIViewController.fetchUserDocument,
-      for: .primaryActionTriggered
-    )
+    fetchUserDocumentButton.addTarget(self, action: FireBaseUIViewController.fetchUserDocument,
+                                      for: .primaryActionTriggered)
 
     userDetailsLabel.text = "No User Data Fetched"
 
@@ -247,8 +242,8 @@ internal final class FireBaseUIViewController: ViewController {
       do {
         let firestore = Firestore.firestore()
         let document = firestore
-          .collection("users")
-          .document(user.uid)
+            .collection("users")
+            .document(user.uid)
         let snapshot = try await document.get()
         await MainActor.run { [weak self] in
           guard let self else { return }
