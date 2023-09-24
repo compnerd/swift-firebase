@@ -49,13 +49,13 @@ extension DocumentReference {
 
   public func addSnapshotListener(includeMetadataChanges: Bool, listener: @escaping SnapshotListenerCallback) -> ListenerRegistration? {
     let boxed = Unmanaged.passRetained(listener as AnyObject)
-    let internalRegistration = swift_firebase.swift_cxx_shims.firebase.firestore.document_add_snapshot_listener(self, { snapshot, errorCode, errorMessage, pvListener in
+    let instance = swift_firebase.swift_cxx_shims.firebase.firestore.document_add_snapshot_listener(self, { snapshot, errorCode, errorMessage, pvListener in
         if let pvListener = pvListener, let callback = Unmanaged<AnyObject>.fromOpaque(pvListener).takeUnretainedValue() as? SnapshotListenerCallback {
           callback(snapshot.pointee, errorCode.pointee, String(cString: errorMessage!))
         }
       }, UnsafeMutableRawPointer(boxed.toOpaque()))
 
-    return ListenerRegistration(boxed, internalRegistration)
+    return ListenerRegistration(boxed, instance)
   }
 }
 
