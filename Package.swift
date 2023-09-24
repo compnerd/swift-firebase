@@ -30,6 +30,19 @@ let SwiftFirebase =
                         .define("INTERNAL_EXPERIMENTAL"),
                         .define("_CRT_SECURE_NO_WARNINGS",
                                 .when(platforms: [.windows])),
+                      ],
+                      linkerSettings: [
+                        .unsafeFlags([
+                          "-Lthird_party/firebase-development/usr/libs/windows",
+                          "-Lthird_party/firebase-development/usr/libs/windows/deps/app",
+                          "-Lthird_party/firebase-development/usr/libs/windows/deps/app/external",
+                        ]),
+                        .linkedLibrary("crypto"),
+                        .linkedLibrary("firebase_rest_lib"),
+                        .linkedLibrary("flatbuffers"),
+                        .linkedLibrary("libcurl"),
+                        .linkedLibrary("ssl"),
+                        .linkedLibrary("zlibstatic"),
                       ]),
               .target(name: "FirebaseCore",
                       dependencies: ["firebase"],
@@ -65,6 +78,11 @@ let SwiftFirebase =
                         .interoperabilityMode(.Cxx),
                       ],
                       linkerSettings: [
+                        .unsafeFlags([
+                          "-Lthird_party/firebase-development/usr/libs/windows",
+                          "-Lthird_party/firebase-development/usr/libs/windows/deps/app",
+                          "-Lthird_party/firebase-development/usr/libs/windows/deps/app/external",
+                        ]),
                         .linkedLibrary("absl_bad_optional_access"),
                         .linkedLibrary("absl_bad_variant_access"),
                         .linkedLibrary("absl_base"),
@@ -116,8 +134,7 @@ let SwiftFirebase =
                         .linkedLibrary("re2"),
                         .linkedLibrary("snappy"),
                         .linkedLibrary("upb"),
-                      ]
-                      ),
+                      ]),
               .executableTarget(name: "FireBaseUI",
                                 dependencies: [
                                   "FirebaseCore",
@@ -140,18 +157,5 @@ let SwiftFirebase =
                                 swiftSettings: [
                                   .interoperabilityMode(.Cxx),
                                   .unsafeFlags(["-parse-as-library"])
-                                ],
-                                linkerSettings: [
-                                  .unsafeFlags([
-                                    "-Lthird_party/firebase-development/usr/libs/windows",
-                                    "-Lthird_party/firebase-development/usr/libs/windows/deps/app",
-                                    "-Lthird_party/firebase-development/usr/libs/windows/deps/app/external",
-                                  ]),
-                                  .linkedLibrary("crypto"),
-                                  .linkedLibrary("firebase_rest_lib"),
-                                  .linkedLibrary("flatbuffers"),
-                                  .linkedLibrary("libcurl"),
-                                  .linkedLibrary("ssl"),
-                                  .linkedLibrary("zlibstatic"),
                                 ])
             ])
