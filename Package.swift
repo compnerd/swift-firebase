@@ -20,9 +20,6 @@ let SwiftFirebase =
               .target(name: "firebase",
                       publicHeadersPath: "include",
                       cSettings: [
-                        .unsafeFlags([
-                          "-iapinotes-modules", "Sources/firebase/include",
-                        ]),
                         .headerSearchPath("../../third_party/firebase-development/usr/include"),
                       ],
                       cxxSettings: [
@@ -145,11 +142,6 @@ let SwiftFirebase =
                                 path: "Examples/FireBaseUI",
                                 resources: [.copy("Resources")],
                                 packageAccess: false,
-                                cSettings: [
-                                  .unsafeFlags([
-                                    "-iapinotes-modules", "Sources/firebase/include",
-                                  ]),
-                                ],
                                 cxxSettings: [
                                   .define("INTERNAL_EXPERIMENTAL"),
                                   .define("_CRT_SECURE_NO_WARNINGS", .when(platforms: [.windows])),
