@@ -24,4 +24,10 @@ module firebase [system] {
     header "FirebaseLogging.hh"
     export *
   }
+
+  module firestore {
+    header "FirebaseFirestore.hh"
+    export *
+    link "firebase_firestore"
+  }
 }

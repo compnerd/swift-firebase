@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 import FirebaseCore
+import FirebaseFirestore
 import FirebaseAuth
 import SwiftWin32
 
@@ -34,6 +35,24 @@ extension FireBaseLogLevelPickerHandler: PickerViewDelegate {
 
 // MARK: - FireBaseUIViewController
 
+extension Rect {
+  var maxY: Double {
+    origin.y + size.height
+  }
+
+  var minY: Double {
+    origin.y
+  }
+
+  var minX: Double {
+    origin.x
+  }
+
+  var maxX: Double {
+    origin.x + size.width
+  }
+}
+
 internal final class FireBaseUIViewController: ViewController {
   fileprivate let firebaseLogHandler = FireBaseLogLevelPickerHandler()
 
@@ -54,6 +73,15 @@ internal final class FireBaseUIViewController: ViewController {
                          title: "Verify Email")
   var btnReset = Button(frame: Rect(x: 256, y: 324, width: 156, height: 32),
                         title: "Reset Password")
+
+  lazy var fetchUserDocumentButton: Button = {
+    return Button(frame: .init(x: btnReset.frame.maxX, y: btnReset.frame.minY, width: 100, height: 32),
+                  title: "Get User")
+  }()
+
+  lazy var userDetailsLabel = {
+    Label(frame: .init(x: btnCreate.frame.minX, y: btnReset.frame.maxY, width: view.frame.width - 16, height: 400))
+  }()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -114,6 +142,14 @@ internal final class FireBaseUIViewController: ViewController {
     btnReset.addTarget(self, action: FireBaseUIViewController.resetPassword,
                        for: .primaryActionTriggered)
     self.view?.addSubview(btnReset)
+
+    fetchUserDocumentButton.addTarget(self, action: FireBaseUIViewController.fetchUserDocument,
+                                      for: .primaryActionTriggered)
+
+    userDetailsLabel.text = "No User Data Fetched"
+
+    view?.addSubview(fetchUserDocumentButton)
+    view?.addSubview(userDetailsLabel)
   }
 
   private func signIn() {
@@ -192,6 +228,29 @@ internal final class FireBaseUIViewController: ViewController {
         _ = try await Auth.auth().sendPasswordReset(withEmail: email)
       } catch {
         print("Error sending password reset: \(error.localizedDescription)")
+      }
+    }
+  }
+
+  private func fetchUserDocument() {
+    guard let user = Auth.auth().currentUser else {
+      print("No current user, can't fetch document...")
+      return
+    }
+
+    Task {
+      do {
+        let firestore = Firestore.firestore()
+        let document = firestore
+            .collection("users")
+            .document(user.uid)
+        let snapshot = try await document.get()
+        await MainActor.run { [weak self] in
+          guard let self else { return }
+          userDetailsLabel.text = snapshot.debugDescription
+        }
+      } catch {
+        print("Error fetching snapshot: \(error)")
       }
     }
   }
