@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 import FirebaseCore
+import FirebaseFirestore
 import FirebaseAuth
 import FirebaseFirestore
 import SwiftWin32
@@ -237,7 +238,6 @@ internal final class FireBaseUIViewController: ViewController {
             .collection("users")
             .document(user.uid)
         let snapshot = try await document.get()
-
         await MainActor.run { [weak self] in
           guard let self else { return }
           userDetailsLabel.text = snapshot.debugDescription
