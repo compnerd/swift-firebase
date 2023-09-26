@@ -35,9 +35,8 @@ internal final class FirestoreTestingViewController: ViewController {
                           for: .primaryActionTriggered)
 
     startButton.addTarget(self,
-      action: FirestoreTestingViewController.startSubscriptionFromInput,
-      for: .primaryActionTriggered
-    )
+                          action: FirestoreTestingViewController.startSubscriptionFromInput,
+                          for: .primaryActionTriggered)
 
     stopButton.addTarget(self,
       action: FirestoreTestingViewController.stopSubscription,
