@@ -65,10 +65,9 @@ internal final class FireBaseUIViewController: ViewController {
   }()
 
   lazy var firestoreTestingButton: Button = {
-    return Button(
-      frame: .init(x: btnReset.frame.maxX, y: btnReset.frame.minY, width: 200, height: 32),
-      title: "Firestore Testing"
-    )
+    return Button(frame: .init(x: btnReset.frame.maxX, y: btnReset.frame.minY,
+                               width: 200, height: 32),
+                  title: "Firestore Testing")
   }()
 
   lazy var userDetailsLabel = {
