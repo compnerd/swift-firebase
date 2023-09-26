@@ -31,9 +31,8 @@ internal final class FirestoreTestingViewController: ViewController {
     title = "Firestore Testing"
 
     fetchButton.addTarget(self,
-      action: FirestoreTestingViewController.fetchFromInput,
-      for: .primaryActionTriggered
-    )
+                          action: FirestoreTestingViewController.fetchFromInput,
+                          for: .primaryActionTriggered)
 
     startButton.addTarget(self,
       action: FirestoreTestingViewController.startSubscriptionFromInput,
