@@ -9,7 +9,8 @@ import CxxShim
 import Foundation
 
 public typealias DocumentReference = firebase.firestore.DocumentReference
-public typealias DocumentSnapshot = firebase.firestore.DocumentSnapshot
+public typealias SnapshotListenerCallback = (DocumentSnapshot?, firebase.firestore.Error?, String?) -> Void
+
 
 extension DocumentReference {
   public var firestore: Firestore {
@@ -41,15 +42,24 @@ extension DocumentReference {
 
     return snapshot.pointee
   }
-}
 
-extension DocumentReference: CustomDebugStringConvertible {
-  public var debugDescription: String {
-    String(self.ToString())
+  public func addSnapshotListener(_ listener: @escaping SnapshotListenerCallback) -> ListenerRegistration? {
+    addSnapshotListener(includeMetadataChanges: false, listener: listener)
+  }
+
+  public func addSnapshotListener(includeMetadataChanges: Bool, listener: @escaping SnapshotListenerCallback) -> ListenerRegistration? {
+    let boxed = Unmanaged.passRetained(listener as AnyObject)
+    let instance = swift_firebase.swift_cxx_shims.firebase.firestore.document_add_snapshot_listener(self, { snapshot, errorCode, errorMessage, pvListener in
+        if let pvListener = pvListener, let callback = Unmanaged<AnyObject>.fromOpaque(pvListener).takeUnretainedValue() as? SnapshotListenerCallback {
+          callback(snapshot.pointee, errorCode.pointee, String(cString: errorMessage!))
+        }
+      }, UnsafeMutableRawPointer(boxed.toOpaque()))
+
+    return ListenerRegistration(boxed, instance)
   }
 }
 
-extension DocumentSnapshot: CustomDebugStringConvertible {
+extension DocumentReference: CustomDebugStringConvertible {
   public var debugDescription: String {
     String(self.ToString())
   }
