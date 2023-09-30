@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  spm:
     runs-on: windows-latest
 
     strategy:
@@ -18,7 +18,7 @@ jobs:
             tag: DEVELOPMENT-SNAPSHOT-2024-02-08-a
             options: -Xswiftc "-I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include"
 
-    name: Swift ${{ matrix.tag }}
+    name: SPM - Swift ${{ matrix.tag }}
 
     steps:
       - uses: compnerd/gha-setup-swift@main
@@ -31,7 +31,7 @@ jobs:
       - uses: dsaltares/fetch-gh-release-asset@a40c8b4a0471f9ab81bdf73a010f74cc51476ad4 # v1.1.1
         with:
           repo: thebrowsercompany/firebase-cpp-sdk
-          version: tags/20230921.0
+          version: tags/20240306.0
           file: firebase-windows-amd64.zip
 
       - run: Expand-Archive -Path firebase-windows-amd64.zip -DestinationPath third_party/firebase-development
@@ -39,3 +39,41 @@ jobs:
 
       - name: Build
         run: swift build -v ${{ matrix.options }}
+
+  cmake:
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - branch: development
+            tag: DEVELOPMENT-SNAPSHOT-2024-02-08-a
+            options: -I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include
+
+    name: CMake - Swift ${{ matrix.tag }}
+
+    steps:
+      - uses: compnerd/gha-setup-vsdevenv@main
+
+      - uses: compnerd/gha-setup-swift@main
+        with:
+          tag: ${{ matrix.tag }}
+          branch: ${{ matrix.branch }}
+
+      - uses: actions/checkout@v3
+
+      - uses: dsaltares/fetch-gh-release-asset@a40c8b4a0471f9ab81bdf73a010f74cc51476ad4 # v1.1.1
+        with:
+          repo: thebrowsercompany/firebase-cpp-sdk
+          version: tags/20240306.0
+          file: firebase-windows-amd64.zip
+
+      - run: Expand-Archive -Path firebase-windows-amd64.zip -DestinationPath third_party/firebase-development
+        shell: powershell
+
+      - name: Configure
+        run: cmake -B out -D CMAKE_BUILD_TYPE=Release -G Ninja -S ${{ github.workspace }} -D CMAKE_Swift_FLAGS="${{ matrix.options }}" -D SWIFT_FIREBASE_BUILD_EXAMPLES=NO
+
+      - name: Build
+        run: cmake --build out
