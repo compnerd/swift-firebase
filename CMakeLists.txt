@@ -54,6 +54,7 @@ add_library(FirebaseAuth SHARED
   Sources/FirebaseAuth/FirebaseAuth+Swift.swift
   Sources/FirebaseAuth/FirebaseAuthError.swift
   Sources/FirebaseAuth/FirebaseAuthResult+Swift.swift
+  Sources/FirebaseAuth/FirebaseEmailAuthProvider.swift
   Sources/FirebaseAuth/FirebaseUser+Swift.swift)
 target_compile_options(FirebaseAuth PRIVATE
   -cxx-interoperability-mode=default)
