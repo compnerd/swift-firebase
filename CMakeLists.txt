@@ -22,7 +22,7 @@ target_link_directories(firebase INTERFACE
   third_party/firebase-development/usr/libs/windows/deps/app
   third_party/firebase-development/usr/libs/windows/deps/app/external)
 
-add_library(FirebaseCore
+add_library(FirebaseCore SHARED
   Sources/FirebaseCore/FirebaseApp+Swift.swift
   Sources/FirebaseCore/FirebaseConfiguration.swift
   Sources/FirebaseCore/FirebaseError.swift
@@ -30,12 +30,15 @@ add_library(FirebaseCore
   Sources/FirebaseCore/FirebaseOptions+Swift.swift)
 target_compile_options(FirebaseCore PRIVATE
   -cxx-interoperability-mode=default)
+target_link_libraries(FirebaseCore PUBLIC
+  firebase)
 target_link_libraries(FirebaseCore PRIVATE
   libcurl
-  firebase
+  firebase_app
+  flatbuffers
   zlibstatic)
 
-add_library(FirebaseAuth
+add_library(FirebaseAuth SHARED
   Sources/FirebaseAuth/FIRActionCodeOperation.swift
   Sources/FirebaseAuth/FIRAuthTokenResult.swift
   Sources/FirebaseAuth/FirebaseAuth+Swift.swift
@@ -45,14 +48,17 @@ add_library(FirebaseAuth
 target_compile_options(FirebaseAuth PRIVATE
   -cxx-interoperability-mode=default)
 target_link_libraries(FirebaseAuth PUBLIC
+  firebase
   FirebaseCore)
 target_link_libraries(FirebaseAuth PRIVATE
   crypto
-  firebase
   firebase_rest_lib
-  flatbuffers)
+  flatbuffers
+  libcurl
+  ssl
+  zlibstatic)
 
-add_library(FirebaseFirestore
+add_library(FirebaseFirestore SHARED
   Sources/FirebaseFirestore/CollectionReference+Swift.swift
   Sources/FirebaseFirestore/DocumentReference+Swift.swift
   Sources/FirebaseFirestore/DocumentSnapshot+Swift.swift
@@ -62,6 +68,7 @@ add_library(FirebaseFirestore
 target_compile_options(FirebaseFirestore PRIVATE
   -cxx-interoperability-mode=default)
 target_link_libraries(FirebaseFirestore PUBLIC
+  firebase
   FirebaseCore)
 target_link_libraries(FirebaseFirestore PRIVATE
   absl_bad_optional_access
@@ -103,7 +110,7 @@ target_link_libraries(FirebaseFirestore PRIVATE
   absl_time_zone
   address_sorting
   cares
-  firebase
+  crypto
   firestore_core
   firestore_nanopb
   firestore_protos_nanopb
@@ -112,11 +119,13 @@ target_link_libraries(FirebaseFirestore PRIVATE
   grpc
   grpc++
   leveldb
+  libcurl
   protobuf-nanopb
   re2
   snappy
   ssl
-  upb)
+  upb
+  zlibstatic)
 
 FetchContent_Declare(SwiftWin32
   GIT_REPOSITORY https://github.com/compnerd/swift-win32
