@@ -26,8 +26,11 @@ extension firebase.AppOptions: CustomDebugStringConvertible {
 }
 
 extension FirebaseOptions {
-  public static func defaultOptions() -> FirebaseOptions? {
-    firebase.AppOptions.LoadDefault(nil)
+  public static func defaultOptions() -> FirebaseOptions {
+    guard let options = firebase.AppOptions.LoadDefault(nil) else {
+      fatalError("unable to deserialise firebase options")
+    }
+    return options
   }
 
   public init?(contentsOfFile plistPath: String) {
