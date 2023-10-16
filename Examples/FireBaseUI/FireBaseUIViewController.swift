@@ -3,7 +3,6 @@
 import FirebaseCore
 import FirebaseFirestore
 import FirebaseAuth
-import FirebaseFirestore
 import SwiftWin32
 
 private final class FireBaseLogLevelPickerHandler {

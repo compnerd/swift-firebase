@@ -129,3 +129,27 @@ extension FirebaseOptions {
   @available(*, unavailable)
   public var appGroupId: String? { nil }
 }
+
+extension FirebaseOptions {
+  /// The format of a specified config file
+  public enum ConfigFormat {
+    /// Specifies that the file contents should be treated as a json string.
+    case json
+  }
+
+  /// An added initializer which will allow loading of a config from a specified file.
+  /// - Parameters:
+  ///   - path: The path where the config file can be found.
+  ///   - format: A format which describes how the content of the file should be treated.
+  public init?(_contentsOfFile path: URL, format: ConfigFormat) {
+    guard let data = try? Data(contentsOf: path, options: .alwaysMapped) else { return nil }
+    switch format {
+      case .json:
+        let config = String(data: data, encoding: .utf8)
+        guard let options = firebase.AppOptions.LoadFromJsonConfig(config, nil) else {
+          return nil
+        }
+        self = options
+    }
+  }
+}
