@@ -25,7 +25,7 @@ public struct AuthTokenResult {
     // The JWT should have three components
     guard components.count == 3 else {
       throw NSError(domain: "com.google.firebase.auth",
-                    code: AuthError.Code.malformedJWT.rawValue,
+                    code: AuthErrorCode.malformedJWT.rawValue,
                     userInfo: [NSLocalizedDescriptionKey:"Failed to decode token"])
     }
 
@@ -39,7 +39,7 @@ public struct AuthTokenResult {
     guard let data = Data(base64Encoded: payload,
                           options: .ignoreUnknownCharacters) else {
       throw NSError(domain: "com.google.firebase.auth",
-                    code: AuthError.Code.malformedJWT.rawValue,
+                    code: AuthErrorCode.malformedJWT.rawValue,
                     userInfo: [NSLocalizedDescriptionKey:"Failed to decode token payload"])
     }
 
@@ -49,7 +49,7 @@ public struct AuthTokenResult {
         try? JSONSerialization.jsonObject(with: data, options: options)
             as? [String:Any] else {
       throw NSError(domain: "com.google.firebase.auth",
-                    code: AuthError.Code.malformedJWT.rawValue,
+                    code: AuthErrorCode.malformedJWT.rawValue,
                     userInfo: [NSLocalizedDescriptionKey:"Failed to deserialise token payload"])
     }
 
@@ -60,7 +60,7 @@ public struct AuthTokenResult {
           let expirationDate = contents["exp"] as? TimeInterval,
           let issueDate = contents["iat"] as? TimeInterval else {
       throw NSError(domain: "com.google.firebase.auth",
-                    code: AuthError.Code.malformedJWT.rawValue,
+                    code: AuthErrorCode.malformedJWT.rawValue,
                     userInfo: [NSLocalizedDescriptionKey:"Missing fields in token payload"])
     }
 
