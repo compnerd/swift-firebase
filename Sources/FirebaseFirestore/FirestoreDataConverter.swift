@@ -47,7 +47,6 @@ struct FirestoreDataConverter {
 
       return array
       case .map:
-      let map = field.map_value()
       let value = swift_firebase.swift_cxx_shims.firebase.firestore.field_value_workaround(field.map_value())
       var dictionary = [String: Any]()
 

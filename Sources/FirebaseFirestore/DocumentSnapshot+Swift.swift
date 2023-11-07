@@ -16,18 +16,22 @@ extension DocumentSnapshot {
   public var reference: DocumentReference {
     swift_firebase.swift_cxx_shims.firebase.firestore.snapshot_reference(self)
   }
-  public func data<T: Decodable>(as type: T.Type,
-                          with serverTimestampBehavior: ServerTimestampBehavior = .none,
-                          decoder: Firestore.Decoder = .init()) throws -> T {
-    let d: Any = data(with: serverTimestampBehavior) ?? NSNull()
-
-    return try decoder.decode(T.self, from: d, in: reference)
-  }
 
   public func data(with behavior: ServerTimestampBehavior) -> [String: Any]? {
     let data = swift_firebase.swift_cxx_shims.firebase.firestore.snapshot_get_data(self, behavior)
 
     return FirestoreDataConverter.value(workaround: data)
+  }
+}
+
+public extension DocumentSnapshot {
+    func data<T: Decodable>(as type: T.Type,
+                            with serverTimestampBehavior: ServerTimestampBehavior = .none,
+                            decoder: FirebaseDataDecoder =  .init()) throws -> T {
+    let value: Any = data(with: serverTimestampBehavior) ?? NSNull()
+    let result = try decoder.decode(T.self, from: value)
+
+    return result
   }
 }
 
