@@ -12,6 +12,9 @@ public typealias DocumentSnapshot = firebase.firestore.DocumentSnapshot
 public typealias ServerTimestampBehavior = firebase.firestore.DocumentSnapshot.ServerTimestampBehavior
 public typealias MapFieldValue = firebase.firestore.MapFieldValue
 
+public typealias GeoPoint = firebase.firestore.GeoPoint
+public typealias FieldValue = firebase.firestore.FieldValue
+
 extension DocumentSnapshot {
   public var reference: DocumentReference {
     swift_firebase.swift_cxx_shims.firebase.firestore.snapshot_reference(self)
@@ -27,9 +30,9 @@ extension DocumentSnapshot {
 public extension DocumentSnapshot {
     func data<T: Decodable>(as type: T.Type,
                             with serverTimestampBehavior: ServerTimestampBehavior = .none,
-                            decoder: FirebaseDataDecoder =  .init()) throws -> T {
+                            decoder: Firestore.Decoder =  .init()) throws -> T {
     let value: Any = data(with: serverTimestampBehavior) ?? NSNull()
-    let result = try decoder.decode(T.self, from: value)
+    let result = try decoder.decode(T.self, from: value, in: reference)
 
     return result
   }

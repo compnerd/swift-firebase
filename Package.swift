@@ -65,6 +65,10 @@ let SwiftFirebase =
                       ]),
               .target(name: "FirebaseFirestore",
                       dependencies: ["firebase", "FirebaseCore"],
+                      exclude: [
+                        "vendor/README.md",
+                        "vendor/LICENSE"
+                      ],
                       cxxSettings: [
                         .define("INTERNAL_EXPERIMENTAL"),
                         .define("_CRT_SECURE_NO_WARNINGS",
@@ -79,6 +83,8 @@ let SwiftFirebase =
                           "-Lthird_party/firebase-development/usr/libs/windows",
                           "-Lthird_party/firebase-development/usr/libs/windows/deps/app",
                           "-Lthird_party/firebase-development/usr/libs/windows/deps/app/external",
+                          "-Xlinker",
+                          "-ignore:4217"
                         ]),
                         .linkedLibrary("absl_bad_optional_access"),
                         .linkedLibrary("absl_bad_variant_access"),
@@ -86,7 +92,6 @@ let SwiftFirebase =
                         .linkedLibrary("absl_city"),
                         .linkedLibrary("absl_cord"),
                         .linkedLibrary("absl_cord_internal"),
-                        .linkedLibrary("absl_cordz_functions"),
                         .linkedLibrary("absl_cordz_handle"),
                         .linkedLibrary("absl_cordz_info"),
                         .linkedLibrary("absl_graphcycles_internal"),
