@@ -92,6 +92,7 @@ let SwiftFirebase =
                         .linkedLibrary("absl_city"),
                         .linkedLibrary("absl_cord"),
                         .linkedLibrary("absl_cord_internal"),
+                        .linkedLibrary("absl_cordz_functions"),
                         .linkedLibrary("absl_cordz_handle"),
                         .linkedLibrary("absl_cordz_info"),
                         .linkedLibrary("absl_graphcycles_internal"),

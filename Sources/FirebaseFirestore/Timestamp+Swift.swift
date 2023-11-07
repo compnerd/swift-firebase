@@ -25,6 +25,15 @@ extension Timestamp {
   public init(seconds: Int64, nanoseconds: Int32) {
     self = Timestamp(seconds, nanoseconds)
   }
+
+  public func dateValue() -> Date {
+    let seconds = TimeInterval(self.seconds())
+    let nanoseconds = TimeInterval(self.nanoseconds())
+
+    let interval = TimeInterval(seconds + nanoseconds / 1e9)
+
+    return Date(timeIntervalSince1970: interval)
+  }
 }
 
 extension Timestamp: Codable {
