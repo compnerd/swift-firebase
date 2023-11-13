@@ -65,7 +65,12 @@ let SwiftFirebase =
                       ]),
               .target(name: "FirebaseFirestore",
                       dependencies: ["firebase", "FirebaseCore"],
+                      exclude: [
+                        "vendor/README.md",
+                        "vendor/LICENSE"
+                      ],
                       cxxSettings: [
+                        .define("SR69711"),
                         .define("INTERNAL_EXPERIMENTAL"),
                         .define("_CRT_SECURE_NO_WARNINGS",
                                 .when(platforms: [.windows])),

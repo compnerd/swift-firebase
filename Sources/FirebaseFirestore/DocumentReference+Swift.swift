@@ -13,6 +13,10 @@ public typealias SnapshotListenerCallback = (DocumentSnapshot?, firebase.firesto
 
 
 extension DocumentReference {
+  public var documentID: String {
+    String(swift_firebase.swift_cxx_shims.firebase.firestore.document_id(self))
+  }
+
   public var firestore: Firestore {
     swift_firebase.swift_cxx_shims.firebase.firestore.document_firestore(self)!
   }
