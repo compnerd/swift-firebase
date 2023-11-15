@@ -73,10 +73,21 @@ internal final class FireBaseUIViewController: ViewController {
     Label(frame: .init(x: btnCreate.frame.minX, y: btnReset.frame.maxY, width: view.frame.width - 16, height: 400))
   }()
 
+  var authStateListenerHandle: AuthStateDidChangeListenerHandle?
+
   override func viewDidLoad() {
     super.viewDidLoad()
     self.title = "FireBase UI"
     configureView()
+
+    authStateListenerHandle = Auth.auth().addStateDidChangeListener { auth, user in
+      print(
+      """
+      Auth State Changed!
+      Auth: \(String(describing: auth))
+      User: \(String(describing: user))
+      """)
+    }
 
     if let user = Auth.auth().currentUser {
       txtEmail.text = user.email
@@ -252,5 +263,11 @@ internal final class FireBaseUIViewController: ViewController {
       return
     }
     firestoreTestingWindow.makeKeyAndVisible()
+  }
+
+  deinit {
+    if let handle = authStateListenerHandle {
+      Auth.auth().removeStateDidChangeListener(handle)
+    }
   }
 }
