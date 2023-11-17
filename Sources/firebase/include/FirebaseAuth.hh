@@ -5,6 +5,16 @@
 
 #include <firebase/auth.h>
 
+// https://github.com/apple/swift/issues/69959
+#if __has_include(<swift/bridging>)
+#include <swift/bridging>
+#else
+#define SWIFT_UNSAFE_REFERENCE                        \
+  __attribute__((__swift_attr__("import_reference"))) \
+  __attribute__((__swift_attr__("retain:immortal")))  \
+  __attribute__((__swift_attr__("release:immortal")))
+#endif
+
 namespace swift_firebase::swift_cxx_shims::firebase::auth {
 inline std::string
 user_display_name(const ::firebase::auth::User &user) noexcept {
@@ -33,36 +43,43 @@ inline std::string user_uid(const ::firebase::auth::User &user) noexcept {
   return user.uid();
 }
 
-typedef void (*AuthStateListenerCallback)(::firebase::auth::Auth *auth,
-                                          ::firebase::auth::User *user,
-                                          void *user_data);
-
-class ApplicationAuthStateListener
+class SWIFT_UNSAFE_REFERENCE AuthStateListener
     : public ::firebase::auth::AuthStateListener {
+  typedef void (*Handler)(::firebase::auth::Auth *auth,
+                          ::firebase::auth::User *user, void *user_data);
+
 public:
-  ApplicationAuthStateListener(AuthStateListenerCallback initial_callback,
-                               void *initial_data)
-      : callback(initial_callback), user_data(initial_data) {}
+  AuthStateListener(Handler handler, void *data) noexcept
+      : block_(handler), user_data_(data) {}
+
+  AuthStateListener(const AuthStateListener &) = delete;
+  AuthStateListener &operator=(const AuthStateListener &) = delete;
+
+  AuthStateListener(AuthStateListener &&) = delete;
+  AuthStateListener &operator=(AuthStateListener &&) = delete;
 
   void OnAuthStateChanged(::firebase::auth::Auth *auth) override {
     ::firebase::auth::User user = auth->current_user();
-    callback(auth, &user, user_data);
+    block_(auth, &user, user_data_);
+  }
+
+  /// @brief Allocate an auth listener on the heap and return it configured with the passed in parameters.
+  /// @param handler This is the callback that you would like to run whenever Firebase tells us that auth has changed, typically you will construct this inline with the function call.
+  /// @param user_data User specified data that will be passed to the handler.
+  /// @return A heap-allocated auth listener.
+  static inline ::firebase::auth::AuthStateListener *
+  Create(Handler handler, void *user_data) noexcept {
+    return new AuthStateListener(handler, user_data);
+  }
+
+  static inline void Destroy(void *listener) noexcept {
+    delete reinterpret_cast<AuthStateListener *>(listener);
   }
 
 private:
-  AuthStateListenerCallback callback;
-  void *user_data;
+  Handler block_;
+  void *user_data_;
 };
-
-/// @brief Allocate an auth listener on the heap and return it configured with the passed in parameters.
-/// @param callback This is the callback that you would like to run whenever Firebase tells us that auth has changed, typically you will construct this inline with the function call.
-/// @param user_data This can be used to serialize a Swift closure into so that you can pull it back out when `callback` is run.
-/// @return A heap-allocated auth listener.
-inline ::firebase::auth::AuthStateListener *
-create_auth_state_listener(AuthStateListenerCallback callback,
-                           void *user_data) {
-  return new ApplicationAuthStateListener(callback, user_data);
-}
 } // namespace swift_firebase::swift_cxx_shims::firebase::auth
 
 #endif

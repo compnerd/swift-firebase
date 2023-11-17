@@ -210,22 +210,14 @@ extension Auth {
 
   public func addStateDidChangeListener(_ listener: @escaping (Auth, User?) -> Void)
       -> AuthStateDidChangeListenerHandle {
-    let boxed = Unmanaged.passRetained(listener as AnyObject)
-
-    let listenerPointer: ApplicationAuthStateListenerPointer = swift_firebase.swift_cxx_shims.firebase.auth.create_auth_state_listener({ auth , user, callback in
-      if let callback, let listener =  Unmanaged<AnyObject>.fromOpaque(callback).takeUnretainedValue() as? ((Auth, User?) -> Void) {
-        guard let auth else { return }
-        listener(auth, user.pointee.is_valid() ? user.pointee : nil)
-      }
-    }, UnsafeMutableRawPointer(boxed.toOpaque()))
-
-    self.pointee.AddAuthStateListener(listenerPointer)
-
-    return AuthStateDidChangeListenerHandle(boxed, listenerPointer)
+    let handle = _AuthStateDidChangeListenerHandle(listener)
+    self.pointee.AddAuthStateListener(handle.listener)
+    return handle
   }
 
   public func removeStateDidChangeListener(_ listenerHandle: AuthStateDidChangeListenerHandle) {
-    self.pointee.RemoveAuthStateListener(listenerHandle.listener)
+    guard let handle = listenerHandle as? _AuthStateDidChangeListenerHandle else { return }
+    self.pointee.RemoveAuthStateListener(handle.listener)
   }
 
   // public func addIDTokenDidChangeListener(_ listener: @escaping (Auth, User?) -> Void)
