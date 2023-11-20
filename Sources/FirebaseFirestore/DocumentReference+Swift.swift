@@ -9,7 +9,7 @@ import CxxShim
 import Foundation
 
 public typealias DocumentReference = firebase.firestore.DocumentReference
-public typealias SnapshotListenerCallback = (DocumentSnapshot?, firebase.firestore.Error?, String?) -> Void
+public typealias SnapshotListenerCallback = (DocumentSnapshot?, NSError?) -> Void
 
 
 extension DocumentReference {
@@ -47,15 +47,18 @@ extension DocumentReference {
     return snapshot.pointee
   }
 
-  public func addSnapshotListener(_ listener: @escaping SnapshotListenerCallback) -> ListenerRegistration? {
+  public func addSnapshotListener(_ listener: @escaping SnapshotListenerCallback) -> ListenerRegistration {
     addSnapshotListener(includeMetadataChanges: false, listener: listener)
   }
 
-  public func addSnapshotListener(includeMetadataChanges: Bool, listener: @escaping SnapshotListenerCallback) -> ListenerRegistration? {
+  public func addSnapshotListener(includeMetadataChanges: Bool, listener: @escaping SnapshotListenerCallback) -> ListenerRegistration {
     let boxed = Unmanaged.passRetained(listener as AnyObject)
     let instance = swift_firebase.swift_cxx_shims.firebase.firestore.document_add_snapshot_listener(self, { snapshot, errorCode, errorMessage, pvListener in
         if let pvListener = pvListener, let callback = Unmanaged<AnyObject>.fromOpaque(pvListener).takeUnretainedValue() as? SnapshotListenerCallback {
-          callback(snapshot.pointee, errorCode.pointee, String(cString: errorMessage!))
+          let error = NSError.firestore(errorCode)
+          // We only return a snapshot if the error code isn't 0 (aka the 'ok' error code)
+          let returned = error == nil ? snapshot?.pointee : nil
+          callback(returned, error)
         }
       }, UnsafeMutableRawPointer(boxed.toOpaque()))
 

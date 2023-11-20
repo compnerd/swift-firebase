@@ -89,7 +89,7 @@ collection_document(::firebase::firestore::CollectionReference collection, std::
 }
 
 typedef void (*SnapshotListenerTypedCallback_SwiftWorkaround) (const ::firebase::firestore::DocumentSnapshot *snapshot,
-                                                               ::firebase::firestore::Error *error_code,
+                                                               ::firebase::firestore::Error error_code,
                                                                const char *error_message,
                                                                void *user_data
                                                                );
@@ -102,7 +102,7 @@ document_add_snapshot_listener(
     return document.AddSnapshotListener([callback, user_data](const ::firebase::firestore::DocumentSnapshot &snapshot, ::firebase::firestore::Error error_code, const std::string &error_message) {
       callback(
         &snapshot,
-        &error_code,
+        error_code,
         error_message.c_str(),
         user_data
       );
