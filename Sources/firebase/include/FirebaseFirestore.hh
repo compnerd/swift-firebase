@@ -15,12 +15,12 @@ firestore_settings(::firebase::firestore::Firestore* firestore) {
 }
 
 inline ::firebase::firestore::DocumentReference
-firestore_document(::firebase::firestore::Firestore* firestore, const ::std::string document_path) {
+firestore_document(::firebase::firestore::Firestore* firestore, const ::std::string &document_path) {
   return firestore->Document(document_path);
 }
 
 inline ::firebase::firestore::CollectionReference
-firestore_collection(::firebase::firestore::Firestore* firestore, const ::std::string collection_path) {
+firestore_collection(::firebase::firestore::Firestore* firestore, const ::std::string &collection_path) {
   return firestore->Collection(collection_path);
 }
 
