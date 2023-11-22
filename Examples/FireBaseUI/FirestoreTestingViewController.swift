@@ -68,7 +68,7 @@ internal final class FirestoreTestingViewController: ViewController {
       let document = Firestore.firestore().document(path)
       do {
         let snapshot = try await document.get()
-        await displayData(data: snapshot.debugDescription)
+        await displayData(data: snapshot?.debugDescription ?? "No snapshot")
       } catch {
         await displayError(error: error)
       }

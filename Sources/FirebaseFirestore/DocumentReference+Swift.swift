@@ -29,7 +29,7 @@ extension DocumentReference {
     String(swift_firebase.swift_cxx_shims.firebase.firestore.document_path(self))
   }
 
-  public func get() async throws -> DocumentSnapshot {
+  public func get() async throws -> DocumentSnapshot? {
     typealias Promise = CheckedContinuation<UnsafeMutablePointer<firebase.firestore.DocumentSnapshot>, any Error>
     let snapshot = try await withCheckedThrowingContinuation { (continuation: Promise) in
       let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_get(self, .default)
@@ -48,7 +48,7 @@ extension DocumentReference {
       future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
     }
 
-    return snapshot.pointee
+    return snapshot.pointee.is_valid() ? snapshot.pointee : nil
   }
 
   public func addSnapshotListener(_ listener: @escaping SnapshotListenerCallback) -> ListenerRegistration {
