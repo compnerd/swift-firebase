@@ -8,19 +8,7 @@ private let NanoSecondsPerSecond = 1_000_000_000
 
 extension Timestamp {
   public init(date: Date) {
-    var secondsDouble: Double = 0.0
-    var fraction = modf(date.timeIntervalSince1970, &secondsDouble)
-
-    // Re-implementation of https://github.com/firebase/firebase-ios-sdk/blob/master/Firestore/Source/API/FIRTimestamp.m#L50
-    if (fraction < 0) {
-      fraction += 1.0;
-      secondsDouble -= 1.0;
-    }
-
-    let seconds = Int64(secondsDouble)
-    let nanoseconds = Int32(fraction * Double(NanoSecondsPerSecond))
-
-    self = Timestamp(seconds: seconds, nanoseconds: nanoseconds)
+    self = date.firestoreTimestamp()
   }
 
   public init(seconds: Int64, nanoseconds: Int32) {
@@ -54,5 +42,23 @@ extension Timestamp: Codable {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(seconds(), forKey: .seconds)
     try container.encode(nanoseconds(), forKey: .nanoseconds)
+  }
+}
+
+extension Date {
+  internal func firestoreTimestamp() -> Timestamp {
+    var secondsDouble: Double = 0.0
+    var fraction = modf(timeIntervalSince1970, &secondsDouble)
+
+    // Re-implementation of https://github.com/firebase/firebase-ios-sdk/blob/master/Firestore/Source/API/FIRTimestamp.m#L50
+    if (fraction < 0) {
+      fraction += 1.0;
+      secondsDouble -= 1.0;
+    }
+
+    let seconds = Int64(secondsDouble)
+    let nanoseconds = Int32(fraction * Double(NanoSecondsPerSecond))
+
+    return Timestamp(seconds, nanoseconds)
   }
 }

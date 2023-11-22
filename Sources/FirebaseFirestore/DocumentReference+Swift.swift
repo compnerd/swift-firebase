@@ -11,8 +11,12 @@ import Foundation
 public typealias DocumentReference = firebase.firestore.DocumentReference
 public typealias SnapshotListenerCallback = (DocumentSnapshot?, NSError?) -> Void
 
-
 extension DocumentReference {
+  // Use a serial dispatch queue to write mutations from the block-based API.
+  // Passing these futures into the queue as an item should retain them long enough
+  // to do their job, but not block.
+  private static let mutationQueue = DispatchQueue(label: "firebase.firestore.document.mutations")
+
   public var documentID: String {
     String(swift_firebase.swift_cxx_shims.firebase.firestore.document_id(self))
   }
@@ -63,6 +67,56 @@ extension DocumentReference {
       }, UnsafeMutableRawPointer(boxed.toOpaque()))
 
     return ListenerRegistration(boxed, instance)
+  }
+
+  public func setData(_ data: [String: Any], merge: Bool = false, completion: ((NSError?) -> Void)?) {
+    let boxed = Unmanaged.passRetained(completion as AnyObject)
+    let converted = FirestoreDataConverter.firestoreValue(document: data)
+    let options = merge ? firebase.firestore.SetOptions.Merge() : firebase.firestore.SetOptions()
+
+    Self.mutationQueue.async {
+      let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_set_data(self, converted, options)
+
+      future.OnCompletion_SwiftWorkaround({ future, pvCallback in
+        guard let pCallback = pvCallback, let callback = Unmanaged<AnyObject>.fromOpaque(pCallback).takeUnretainedValue() as? ((NSError?) -> Void)? else {
+          return
+        }
+        if let code = future?.pointee.error(), code != 0 {
+          callback?(NSError(domain: "firebase.firestore.document", code: Int(code)))
+        } else {
+          callback?(nil)
+        }
+      }, UnsafeMutableRawPointer(boxed.toOpaque()))
+
+      future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
+    }
+  }
+}
+
+extension DocumentReference {
+  public func setData(_ data: [String: Any], merge: Bool = false) async throws -> Void {
+    let converted = FirestoreDataConverter.firestoreValue(document: data)
+    let options = merge ? firebase.firestore.SetOptions.Merge() : firebase.firestore.SetOptions()
+
+    typealias Promise = CheckedContinuation<Void, any Error>
+    let dataResponse: Void = try await withCheckedThrowingContinuation { (continuation: Promise) in
+      let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_set_data(self, converted, options)
+      withUnsafePointer(to: continuation) { continuation in
+        future.OnCompletion_SwiftWorkaround({ future, pvContinuation in
+          let pContinuation = pvContinuation?.assumingMemoryBound(to: Promise.self)
+          if future.pointee.error() == 0 {
+            pContinuation.pointee.resume()
+          } else {
+            let code = future.pointee.error()
+            let message = String(cString: future.pointee.__error_messageUnsafe()!)
+            pContinuation.pointee.resume(throwing: FirebaseError(code: code, message: message))
+          }
+        }, UnsafeMutableRawPointer(mutating: continuation))
+
+        future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
+      }
+    }
+    return dataResponse
   }
 }
 
