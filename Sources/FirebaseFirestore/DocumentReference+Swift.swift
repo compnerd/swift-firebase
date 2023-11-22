@@ -94,12 +94,12 @@ extension DocumentReference {
 }
 
 extension DocumentReference {
-  public func setData(_ data: [String: Any], merge: Bool = false) async throws -> Void {
+  public func setData(_ data: [String: Any], merge: Bool = false) async throws {
     let converted = FirestoreDataConverter.firestoreValue(document: data)
     let options = merge ? firebase.firestore.SetOptions.Merge() : firebase.firestore.SetOptions()
 
     typealias Promise = CheckedContinuation<Void, any Error>
-    let dataResponse: Void = try await withCheckedThrowingContinuation { (continuation: Promise) in
+    try await withCheckedThrowingContinuation { (continuation: Promise) in
       let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_set_data(self, converted, options)
       withUnsafePointer(to: continuation) { continuation in
         future.OnCompletion_SwiftWorkaround({ future, pvContinuation in
@@ -116,7 +116,6 @@ extension DocumentReference {
         future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
       }
     }
-    return dataResponse
   }
 }
 

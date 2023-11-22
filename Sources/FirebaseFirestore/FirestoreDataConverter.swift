@@ -56,7 +56,6 @@ internal struct FirestoreDataConverter {
       guard let value = firestoreValue(field: item.value) else { continue }
       map[std.string(item.key)] = value
     }
-
     return map
   }
 
