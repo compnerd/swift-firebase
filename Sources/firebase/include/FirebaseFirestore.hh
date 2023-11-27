@@ -64,6 +64,11 @@ snapshot_reference(const ::firebase::firestore::DocumentSnapshot snapshot) {
   return snapshot.reference();
 }
 
+inline bool
+snapshot_exists(const ::firebase::firestore::DocumentSnapshot &snapshot) {
+  return snapshot.exists();
+}
+
 #if SR69711
 struct MapFieldValue_Workaround {
   std::vector<std::string> keys;
