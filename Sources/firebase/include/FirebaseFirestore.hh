@@ -106,7 +106,7 @@ field_value_workaround(::firebase::firestore::MapFieldValue value) {
 
 inline ::firebase::firestore::DocumentReference
 collection_document(::firebase::firestore::CollectionReference collection,
-                    std::string &document_path) {
+                    const ::std::string &document_path) {
   return collection.Document(document_path);
 }
 
