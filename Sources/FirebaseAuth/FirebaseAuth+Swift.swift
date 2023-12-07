@@ -87,7 +87,18 @@ extension Auth {
       }
       future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
     }
+
+#if SR70253
+    // Workaround compiler crash (SR70253) by not using compactMap
+    // which uses std.vector<std.string>::const_iterator.
+    var result: [String] = []
+    for idx in 0..<providers.pointee.providers.size() {
+      result.append(String(providers.pointee.providers[idx]))
+    }
+    return result
+#else
     return providers.pointee.providers.compactMap(String.init)
+#endif
   }
 
   public func signIn(withEmail email: String, password: String) async throws
