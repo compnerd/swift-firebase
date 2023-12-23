@@ -11,6 +11,22 @@ set(CMAKE_Swift_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/swift)
 
 include(FetchContent)
 
+# Download The Firebase CPP SDK and extract it to disk
+set(FIREBASE_CPP_SDK_VERSION "20230828.0")
+
+message(${CMAKE_SOURCE_DIR})
+
+include(FetchContent)
+FetchContent_Declare(
+    firebase_sdk
+    URL "https://github.com/thebrowsercompany/firebase-cpp-sdk/releases/download/${FIREBASE_CPP_SDK_VERSION}/firebase-windows-amd64.zip"
+    DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party/firebase-development/usr"
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+
+FetchContent_MakeAvailable(firebase_sdk)
+
 add_library(firebase INTERFACE)
 target_compile_options(firebase INTERFACE
   "SHELL:$<$<COMPILE_LANGUAGE:Swift>:-Xcc -DINTERNAL_EXPERIMENTAL>")
