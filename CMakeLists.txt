@@ -120,7 +120,7 @@ target_link_libraries(FirebaseFirestore PRIVATE
 
 FetchContent_Declare(SwiftWin32
   GIT_REPOSITORY https://github.com/compnerd/swift-win32
-  GIT_TAG main)
+  GIT_TAG 07e91e67e86f173743329c6753d9e66ac4727830) # Pinned for reproducibility and before Package@swift-#.#.swift symlinks 
 FetchContent_MakeAvailable(SwiftWin32)
 
 add_executable(FireBaseUI
