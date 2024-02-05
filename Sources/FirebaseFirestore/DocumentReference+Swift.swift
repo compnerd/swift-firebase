@@ -25,6 +25,10 @@ extension DocumentReference {
     swift_firebase.swift_cxx_shims.firebase.firestore.document_firestore(self)!
   }
 
+  public func collection(_ path: String) -> CollectionReference {
+    swift_firebase.swift_cxx_shims.firebase.firestore.document_collection(self, std.string(path))
+  }
+
   public var path: String {
     String(swift_firebase.swift_cxx_shims.firebase.firestore.document_path(self))
   }

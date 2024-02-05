@@ -57,6 +57,12 @@ document_set_data(::firebase::firestore::DocumentReference document,
   return document.Set(data, options);
 }
 
+inline ::firebase::firestore::CollectionReference
+document_collection(::firebase::firestore::DocumentReference document,
+                    const ::std::string &collection_path) {
+  return document.Collection(collection_path);
+}
+
 // MARK: - DocumentSnapshot
 
 inline ::firebase::firestore::DocumentReference
