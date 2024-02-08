@@ -5,3 +5,4 @@ build/
 third_party/
 Examples/FireBaseUI/Resources/google-services-desktop.json
 Package.resolved
+out/*
