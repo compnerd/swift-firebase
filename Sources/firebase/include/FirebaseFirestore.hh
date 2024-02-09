@@ -144,6 +144,28 @@ const uint8_t *field_get_blob(const ::firebase::firestore::FieldValue field) {
 
 typedef std::vector<::firebase::firestore::FieldValue> FirestoreFieldValues;
 
+// MARK: - DocumentChange
+
+inline ::firebase::firestore::DocumentChange::Type
+document_change_type(const ::firebase::firestore::DocumentChange change) {
+  return change.type();
+}
+
+inline ::firebase::firestore::DocumentSnapshot
+document_change_document(const ::firebase::firestore::DocumentChange change) {
+  return change.document();
+}
+
+inline ::std::size_t
+document_change_old_index(const ::firebase::firestore::DocumentChange change) {
+  return change.old_index();
+}
+
+inline ::std::size_t
+document_change_new_index(const ::firebase::firestore::DocumentChange change) {
+  return change.new_index();
+}
+
 } // namespace swift_firebase::swift_cxx_shims::firebase::firestore
 
 #endif
