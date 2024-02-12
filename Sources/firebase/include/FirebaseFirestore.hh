@@ -5,6 +5,8 @@
 
 #include <firebase/firestore.h>
 
+#include "FirebaseCore.hh"
+
 // Functions defined in this namespace are used to get around the lack of
 // virtual function support currently in Swift. As that support changes
 // these functions will go away whenever possible.
@@ -173,7 +175,7 @@ query_firestore(::firebase::firestore::Query query) {
   return query.firestore();
 }
 
-inline ::firebase::Future<::firebase::firestore::QuerySnapshot>
+inline ::swift_firebase::swift_cxx_shims::firebase::ConformingFuture<::firebase::firestore::QuerySnapshot>
 query_get(const ::firebase::firestore::Query query,
              ::firebase::firestore::Source source =
                  ::firebase::firestore::Source::kDefault) {

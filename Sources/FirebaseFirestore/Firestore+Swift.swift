@@ -2,7 +2,7 @@
 
 @_exported
 import firebase
-@_spi(Error)
+@_spi(Internal)
 import FirebaseCore
 
 import CxxShim
