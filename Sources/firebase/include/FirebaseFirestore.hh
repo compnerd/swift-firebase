@@ -166,6 +166,23 @@ document_change_new_index(const ::firebase::firestore::DocumentChange change) {
   return change.new_index();
 }
 
+// MARK: Query
+
+inline ::firebase::firestore::Firestore *
+query_firestore(::firebase::firestore::Query query) {
+  return query.firestore();
+}
+
+inline ::firebase::Future<::firebase::firestore::QuerySnapshot>
+query_get(const ::firebase::firestore::Query query,
+             ::firebase::firestore::Source source =
+                 ::firebase::firestore::Source::kDefault) {
+  return query.Get(source);
+}
+
+// MARK: QuerySnapshot
+
+
 } // namespace swift_firebase::swift_cxx_shims::firebase::firestore
 
 #endif
