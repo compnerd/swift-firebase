@@ -201,6 +201,54 @@ query_add_snapshot_listener(
       });
 }
 
+inline ::firebase::firestore::Query
+query_where_equal_to(
+    const ::firebase::firestore::Query& query,
+    const std::string& field,
+    const ::firebase::firestore::FieldValue& value) {
+  return query.WhereEqualTo(field, value);
+}
+
+inline ::firebase::firestore::Query
+query_where_not_equal_to(
+    const ::firebase::firestore::Query& query,
+    const std::string& field,
+    const ::firebase::firestore::FieldValue& value) {
+  return query.WhereNotEqualTo(field, value);
+}
+
+inline ::firebase::firestore::Query
+query_where_less_than(
+    const ::firebase::firestore::Query& query,
+    const std::string& field,
+    const ::firebase::firestore::FieldValue& value) {
+  return query.WhereLessThan(field, value);
+}
+
+inline ::firebase::firestore::Query
+query_where_less_than_or_equal_to(
+    const ::firebase::firestore::Query& query,
+    const std::string& field,
+    const ::firebase::firestore::FieldValue& value) {
+  return query.WhereLessThanOrEqualTo(field, value);
+}
+
+inline ::firebase::firestore::Query
+query_where_greater_than(
+    const ::firebase::firestore::Query& query,
+    const std::string& field,
+    const ::firebase::firestore::FieldValue& value) {
+  return query.WhereGreaterThan(field, value);
+}
+
+inline ::firebase::firestore::Query
+query_where_greater_than_or_equal_to(
+    const ::firebase::firestore::Query& query,
+    const std::string& field,
+    const ::firebase::firestore::FieldValue& value) {
+  return query.WhereGreaterThanOrEqualTo(field, value);
+}
+
 // MARK: QuerySnapshot
 
 inline ::firebase::firestore::Query

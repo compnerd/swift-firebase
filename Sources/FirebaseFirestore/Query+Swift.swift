@@ -70,69 +70,94 @@ extension Query {
     return ListenerRegistration(boxed, instance)
   }
 
+  private func firestoreValueOrFail(_ value: Any) -> firebase.firestore.FieldValue {
+    guard let value = FirestoreDataConverter.firestoreValue(field: value) else {
+      fatalError("Unexpected value type: \(type(of: value))")
+    }
+    return value
+  }
+
+  public func whereField(_ field: String, isEqualTo value: Any) -> Query {
+    swift_firebase.swift_cxx_shims.firebase.firestore.query_where_equal_to(
+      self, std.string(field), firestoreValueOrFail(value)
+    )
+  }
+
+  public func whereField(_ field: String, isNotEqualTo value: Any) -> Query {
+    swift_firebase.swift_cxx_shims.firebase.firestore.query_where_not_equal_to(
+      self, std.string(field), firestoreValueOrFail(value)
+    )
+  }
+
+  public func whereField(_ field: String, isLessThan value: Any) -> Query {
+    swift_firebase.swift_cxx_shims.firebase.firestore.query_where_less_than(
+      self, std.string(field), firestoreValueOrFail(value)
+    )
+  }
+
+  public func whereField(_ field: String, isLessThanOrEqualTo value: Any) -> Query {
+    swift_firebase.swift_cxx_shims.firebase.firestore.query_where_less_than_or_equal_to(
+      self, std.string(field), firestoreValueOrFail(value)
+    )
+  }
+
+  public func whereField(_ field: String, isGreaterThan value: Any) -> Query {
+    swift_firebase.swift_cxx_shims.firebase.firestore.query_where_greater_than(
+      self, std.string(field), firestoreValueOrFail(value)
+    )
+  }
+
+  public func whereField(_ field: String, isGreaterThanOrEqualTo value: Any) -> Query {
+    swift_firebase.swift_cxx_shims.firebase.firestore.query_where_greater_than_or_equal_to(
+      self, std.string(field), firestoreValueOrFail(value)
+    )
+  }
+
   /* TODO: Implement these remaining methods:
 
   public func whereFilter(_ filter: Filter) -> Query {
   }
 
-  public func whereField(_ field: String, isEqualTo value: Any) -> Query {
-  }
-
-  public func whereField(_ path: FieldPath, isNotEqualTo value: Any) -> Query {
-  }
-
-  public func whereField(_ field: String, isNotEqualTo value: Any) -> Query {
-  }
-
-  public func whereField(_ path: FieldPath, isEqualTo value: Any) -> Query {
-  }
-
-  public func whereField(_ field: String, isLessThan value: Any) -> Query {
-  }
-
-  public func whereField(_ path: FieldPath, isLessThan value: Any) -> Query {
-  }
-
-  public func whereField(_ field: String, isLessThanOrEqualTo value: Any) -> Query {
-  }
-
-  public func whereField(_ path: FieldPath, isLessThanOrEqualTo value: Any) -> Query {
-  }
-
-  public func whereField(_ field: String, isGreaterThan value: Any) -> Query {
-  }
-
-  public func whereField(_ path: FieldPath, isGreaterThan value: Any) -> Query {
-  }
-
-  public func whereField(_ field: String, isGreaterThanOrEqualTo value: Any) -> Query {
-  }
-
-  public func whereField(_ path: FieldPath, isGreaterThanOrEqualTo value: Any) -> Query {
-  }
-
   public func whereField(_ field: String, arrayContains value: Any) -> Query {
-  }
-
-  public func whereField(_ path: FieldPath, arrayContains value: Any) -> Query {
   }
 
   public func whereField(_ field: String, arrayContainsAny values: [Any]) -> Query {
   }
 
-  public func whereField(_ path: FieldPath, arrayContainsAny values: [Any]) -> Query {
-  }
-
   public func whereField(_ field: String, in values: [Any]) -> Query {
-  }
-
-  public func whereField(_ path: FieldPath, in values: [Any]) -> Query {
   }
 
   public func whereField(_ field: String, notIn values: [Any]) -> Query {
   }
 
-  public func whereField(_ path: FIRFieldPath, notIn values: [Any]) -> Query {
+  public func whereField(_ path: FieldPath, isNotEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isLessThan value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isLessThanOrEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isGreaterThan value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isGreaterThanOrEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, arrayContains value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, arrayContainsAny values: [Any]) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, in values: [Any]) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, notIn values: [Any]) -> Query {
   }
 
   public func filter(using predicate: NSPredicate) -> Query {
