@@ -16,8 +16,8 @@ extension Query {
   }
 
   // This variant is provided for compatibility with the ObjC API.
-  public func getDocuments(completion: @escaping (QuerySnapshot?, Error?) -> Void) {
-    let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(self, .default)
+  public func getDocuments(source: FirestoreSource = .default, completion: @escaping (QuerySnapshot?, Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(self, source)
     future.setCompletion({
       let (snapshot, error) = future.resultAndError
       DispatchQueue.main.async {
@@ -26,9 +26,9 @@ extension Query {
     })
   }
 
-  public func getDocuments() async throws -> QuerySnapshot {
+  public func getDocuments(source: FirestoreSource = .default) async throws -> QuerySnapshot {
     try await withCheckedThrowingContinuation { continuation in
-      let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(self, .default)
+      let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(self, source)
       future.setCompletion({
         let (snapshot, error) = future.resultAndError
         if let error {

@@ -34,8 +34,8 @@ extension DocumentReference {
   }
 
   // This variant is provided for compatibility with the ObjC API.
-  public func getDocument(completion: @escaping (DocumentSnapshot?, Error?) -> Void) {
-    let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_get(self, .default)
+  public func getDocument(source: FirestoreSource = .default, completion: @escaping (DocumentSnapshot?, Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_get(self, source)
     future.setCompletion({
       let (snapshot, error) = future.resultAndError
       DispatchQueue.main.async {
@@ -44,9 +44,9 @@ extension DocumentReference {
     })
   }
 
-  public func getDocument() async throws -> DocumentSnapshot {
+  public func getDocument(source: FirestoreSource = .default) async throws -> DocumentSnapshot {
     try await withCheckedThrowingContinuation { continuation in
-      let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_get(self, .default)
+      let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_get(self, source)
       future.setCompletion({
         let (snapshot, error) = future.resultAndError
         if let error {
