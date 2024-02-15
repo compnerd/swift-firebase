@@ -3,7 +3,7 @@
 
 #include <firebase/util.h>
 
-#include <stdio.h>
+#include <swift/bridging>
 
 namespace swift_firebase::swift_cxx_shims::firebase {
 
@@ -14,7 +14,7 @@ typedef void (*FutureCompletionType)(void*);
 // Swift. We can ignore the `FutureBase` param as the Swift caller can just
 // retain the Future as part of its closure.
 template <class R>
-class __attribute__((swift_attr("conforms_to:FirebaseCore.FutureProtocol")))
+class SWIFT_CONFORMS_TO_PROTOCOL(FirebaseCore.FutureProtocol)
   Future : public ::firebase::Future<R> {
  public:
   typedef R ResultType;
