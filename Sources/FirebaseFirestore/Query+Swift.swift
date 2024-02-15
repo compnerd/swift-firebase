@@ -39,4 +39,149 @@ extension Query {
       })
     }
   }
+
+  public func addSnapshotListener(_ listener: @escaping (QuerySnapshot?, Error?) -> Void) -> ListenerRegistration {
+    addSnapshotListener(includeMetadataChanges: false, listener: listener)
+  }
+
+  public func addSnapshotListener(includeMetadataChanges: Bool, listener: @escaping (QuerySnapshot?, Error?) -> Void) -> ListenerRegistration {
+    typealias ListenerCallback = (QuerySnapshot?, Error?) -> Void
+    let boxed = Unmanaged.passRetained(listener as AnyObject)
+    let instance = swift_firebase.swift_cxx_shims.firebase.firestore.query_add_snapshot_listener(
+      self, { snapshot, errorCode, errorMessage, pvListener in
+        let callback = Unmanaged<AnyObject>.fromOpaque(pvListener!).takeUnretainedValue() as! ListenerCallback
+
+        let error = NSError.firestore(errorCode, errorMessage: errorMessage)
+        // We only return a snapshot if the error code isn't 0 (aka the 'ok' error code)
+        let returned = error == nil ? snapshot?.pointee : nil
+
+        // Make sure we dispatch our callback back into the main thread to keep consistent
+        // with the reference API which will call back on the 'user_executor' which typically
+        // ends up being the main queue.
+        // Relevant code:
+        // - https://github.com/firebase/firebase-ios-sdk/blob/main/Firestore/Source/API/FIRFirestore.mm#L210-L218
+        // - https://github.com/firebase/firebase-ios-sdk/blob/main/Firestore/core/src/api/document_reference.cc#L236-L237
+        DispatchQueue.main.async {
+          callback(returned, error)
+        }
+      },
+      boxed.toOpaque()
+    )
+    return ListenerRegistration(boxed, instance)
+  }
+
+  /* TODO: Implement these remaining methods:
+
+  public func whereFilter(_ filter: Filter) -> Query {
+  }
+
+  public func whereField(_ field: String, isEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isNotEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ field: String, isNotEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ field: String, isLessThan value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isLessThan value: Any) -> Query {
+  }
+
+  public func whereField(_ field: String, isLessThanOrEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isLessThanOrEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ field: String, isGreaterThan value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isGreaterThan value: Any) -> Query {
+  }
+
+  public func whereField(_ field: String, isGreaterThanOrEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, isGreaterThanOrEqualTo value: Any) -> Query {
+  }
+
+  public func whereField(_ field: String, arrayContains value: Any) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, arrayContains value: Any) -> Query {
+  }
+
+  public func whereField(_ field: String, arrayContainsAny values: [Any]) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, arrayContainsAny values: [Any]) -> Query {
+  }
+
+  public func whereField(_ field: String, in values: [Any]) -> Query {
+  }
+
+  public func whereField(_ path: FieldPath, in values: [Any]) -> Query {
+  }
+
+  public func whereField(_ field: String, notIn values: [Any]) -> Query {
+  }
+
+  public func whereField(_ path: FIRFieldPath, notIn values: [Any]) -> Query {
+  }
+
+  public func filter(using predicate: NSPredicate) -> Query {
+  }
+
+  public func order(by field: String) -> Query {
+  }
+
+  public func order(by path: FieldPath) -> Query {
+  }
+
+  public func order(by field: String, descending: Bool) -> Query {
+  }
+
+  public func order(by path: FieldPath, descending: Bool) -> Query {
+  }
+
+  public func limit(to limit: Int) -> Query {
+  }
+
+  public func limit(toLast limit: Int) -> Query {
+  }
+
+  public func start(atDocument document: DocumentSnapshot) -> Query {
+  }
+
+  public func start(at fieldValues: [Any]) -> Query {
+  }
+
+  public func start(afterDocument document: DocumentSnapshot) -> Query {
+  }
+
+  public func start(after fieldValues: [Any]) -> Query {
+  }
+
+  public func end(beforeDocument document: DocumentSnapshot) -> Query {
+  }
+
+  public func end(before fieldValues: [Any]) -> Query {
+  }
+
+  public func end(atDocument document: DocumentSnapshot) -> Query {
+  }
+
+  public func end(at fieldValues: [Any]) -> Query {
+  }
+
+  public var count: AggregateQuery {
+  }
+
+  */
 }

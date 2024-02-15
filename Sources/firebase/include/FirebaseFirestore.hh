@@ -119,19 +119,19 @@ collection_document(::firebase::firestore::CollectionReference collection,
   return collection.Document(document_path);
 }
 
-typedef void (*SnapshotListenerTypedCallback_SwiftWorkaround)(
+typedef void (*DocumentSnapshotListenerTypedCallback)(
     const ::firebase::firestore::DocumentSnapshot *snapshot,
     ::firebase::firestore::Error error_code, const char *error_message,
     void *user_data);
 inline ::firebase::firestore::ListenerRegistration
 document_add_snapshot_listener(
     ::firebase::firestore::DocumentReference document,
-    SnapshotListenerTypedCallback_SwiftWorkaround callback, void *user_data) {
+    DocumentSnapshotListenerTypedCallback callback, void *user_data) {
   return document.AddSnapshotListener(
-      [callback,
-       user_data](const ::firebase::firestore::DocumentSnapshot &snapshot,
-                  ::firebase::firestore::Error error_code,
-                  const std::string &error_message) {
+      [callback, user_data](
+          const ::firebase::firestore::DocumentSnapshot &snapshot,
+          ::firebase::firestore::Error error_code,
+          const std::string &error_message) {
         callback(&snapshot, error_code, error_message.c_str(), user_data);
       });
 }
@@ -171,7 +171,7 @@ document_change_new_index(const ::firebase::firestore::DocumentChange change) {
 
 // MARK: Query
 
-inline ::firebase::firestore::Firestore *
+inline ::firebase::firestore::Firestore*
 query_firestore(::firebase::firestore::Query query) {
   return query.firestore();
 }
@@ -182,6 +182,53 @@ query_get(const ::firebase::firestore::Query query,
              ::firebase::firestore::Source source =
                  ::firebase::firestore::Source::kDefault) {
   return query.Get(source);
+}
+
+typedef void (*QuerySnapshotListenerTypedCallback)(
+    const ::firebase::firestore::QuerySnapshot *snapshot,
+    ::firebase::firestore::Error error_code, const char *error_message,
+    void *user_data);
+inline ::firebase::firestore::ListenerRegistration
+query_add_snapshot_listener(
+    ::firebase::firestore::Query query,
+    QuerySnapshotListenerTypedCallback callback, void *user_data) {
+  return query.AddSnapshotListener(
+      [callback, user_data](
+          const ::firebase::firestore::QuerySnapshot &snapshot,
+          ::firebase::firestore::Error error_code,
+          const std::string &error_message) {
+        callback(&snapshot, error_code, error_message.c_str(), user_data);
+      });
+}
+
+// MARK: QuerySnapshot
+
+inline ::firebase::firestore::Query
+query_snapshot_query(const ::firebase::firestore::QuerySnapshot& snapshot) {
+  return snapshot.query();
+}
+
+inline ::firebase::firestore::SnapshotMetadata
+query_snapshot_metadata(const ::firebase::firestore::QuerySnapshot& snapshot) {
+  return snapshot.metadata();
+}
+
+inline std::vector<::firebase::firestore::DocumentChange>
+query_snapshot_document_changes(
+    const ::firebase::firestore::QuerySnapshot& snapshot,
+    ::firebase::firestore::MetadataChanges metadata_changes =
+        ::firebase::firestore::MetadataChanges::kExclude) {
+  return snapshot.DocumentChanges(metadata_changes);
+}
+
+inline std::vector<::firebase::firestore::DocumentSnapshot>
+query_snapshot_documents(const ::firebase::firestore::QuerySnapshot& snapshot) {
+  return snapshot.documents();
+}
+
+inline std::size_t
+query_snapshot_size(const ::firebase::firestore::QuerySnapshot& snapshot) {
+  return snapshot.size();
 }
 
 } // namespace swift_firebase::swift_cxx_shims::firebase::firestore
