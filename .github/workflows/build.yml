@@ -16,7 +16,7 @@ jobs:
         include:
           - branch: development
             tag: DEVELOPMENT-SNAPSHOT-2024-02-08-a
-            options: -Xswiftc "-I${env:SDKROOT}\usr\lib\swift_static\windows"
+            options: -Xswiftc "-I${env:SDKROOT}\usr\lib\swift_static\windows" -Xswiftc "-I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include"
 
     name: Swift ${{ matrix.tag }}
 
