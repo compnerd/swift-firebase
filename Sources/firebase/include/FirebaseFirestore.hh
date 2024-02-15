@@ -5,6 +5,8 @@
 
 #include <firebase/firestore.h>
 
+#include "FirebaseCore.hh"
+
 // Functions defined in this namespace are used to get around the lack of
 // virtual function support currently in Swift. As that support changes
 // these functions will go away whenever possible.
@@ -43,14 +45,15 @@ document_path(const ::firebase::firestore::DocumentReference document) {
   return document.path();
 }
 
-inline ::firebase::Future<::firebase::firestore::DocumentSnapshot>
+inline ::swift_firebase::swift_cxx_shims::firebase::Future<
+    ::firebase::firestore::DocumentSnapshot>
 document_get(const ::firebase::firestore::DocumentReference document,
              ::firebase::firestore::Source source =
                  ::firebase::firestore::Source::kDefault) {
   return document.Get(source);
 }
 
-inline ::firebase::Future<void>
+inline ::swift_firebase::swift_cxx_shims::firebase::Future<void>
 document_set_data(::firebase::firestore::DocumentReference document,
                   const ::firebase::firestore::MapFieldValue data,
                   const ::firebase::firestore::SetOptions options) {
@@ -164,6 +167,21 @@ document_change_old_index(const ::firebase::firestore::DocumentChange change) {
 inline ::std::size_t
 document_change_new_index(const ::firebase::firestore::DocumentChange change) {
   return change.new_index();
+}
+
+// MARK: Query
+
+inline ::firebase::firestore::Firestore *
+query_firestore(::firebase::firestore::Query query) {
+  return query.firestore();
+}
+
+inline ::swift_firebase::swift_cxx_shims::firebase::Future<
+    ::firebase::firestore::QuerySnapshot>
+query_get(const ::firebase::firestore::Query query,
+             ::firebase::firestore::Source source =
+                 ::firebase::firestore::Source::kDefault) {
+  return query.Get(source);
 }
 
 } // namespace swift_firebase::swift_cxx_shims::firebase::firestore

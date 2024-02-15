@@ -4,7 +4,7 @@ public struct FirebaseError: Error {
   public let code: CInt
   public let message: String
 
-  @_spi(Error)
+  @_spi(FirebaseInternal)
   public init(code: CInt, message: String) {
     self.code = code
     self.message = message

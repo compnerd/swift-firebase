@@ -246,7 +246,7 @@ internal final class FireBaseUIViewController: ViewController {
         let document = firestore
             .collection("users")
             .document(user.uid)
-        let snapshot = try await document.get()
+        let snapshot = try await document.getDocument()
         await MainActor.run { [weak self] in
           guard let self else { return }
           userDetailsLabel.text = snapshot.debugDescription
