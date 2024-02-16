@@ -14,7 +14,6 @@ private typealias MapFieldValue = firebase.firestore.MapFieldValue
 public typealias DocumentSnapshot = firebase.firestore.DocumentSnapshot
 public typealias ServerTimestampBehavior = firebase.firestore.DocumentSnapshot.ServerTimestampBehavior
 public typealias GeoPoint = firebase.firestore.GeoPoint
-public typealias FieldValue = firebase.firestore.FieldValue
 
 extension DocumentSnapshot {
   public var reference: DocumentReference {

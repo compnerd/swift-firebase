@@ -151,10 +151,22 @@ document_snapshot_id(::firebase::firestore::DocumentSnapshot snapshot) {
   return snapshot.id();
 }
 
+// MARK: CollectionReference
+
 inline ::firebase::firestore::DocumentReference
 collection_document(::firebase::firestore::CollectionReference collection,
                     const ::std::string &document_path) {
   return collection.Document(document_path);
+}
+
+inline ::std::string
+collection_path(const ::firebase::firestore::CollectionReference& collection) {
+  return collection.path();
+}
+
+inline ::firebase::firestore::Query
+collection_as_query(::firebase::firestore::CollectionReference collection) {
+  return collection;
 }
 
 typedef void (*DocumentSnapshotListenerTypedCallback)(

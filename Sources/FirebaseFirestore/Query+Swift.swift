@@ -10,14 +10,27 @@ import Foundation
 
 public typealias Query = firebase.firestore.Query
 
-extension Query {
+// Any types that extend from Query can conform to QueryProtocol to provide the
+// functionality of Query. This is needed since structs in Swift do not support
+// inheritance and C++ classes are exposed as structs to Swift.
+public protocol QueryProtocol {
+  // This is an internal means to expose `Query` when the conforming type is
+  // intended to be a subclass of `Query`.
+  var _asQuery: Query { get }
+}
+
+extension Query: QueryProtocol {
+  public var _asQuery: Query { self }
+}
+
+extension QueryProtocol {
   public var firestore: Firestore {
-    swift_firebase.swift_cxx_shims.firebase.firestore.query_firestore(self)
+    swift_firebase.swift_cxx_shims.firebase.firestore.query_firestore(_asQuery)
   }
 
   // This variant is provided for compatibility with the ObjC API.
   public func getDocuments(source: FirestoreSource = .default, completion: @escaping (QuerySnapshot?, Error?) -> Void) {
-    let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(self, source)
+    let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(_asQuery, source)
     future.setCompletion({
       let (snapshot, error) = future.resultAndError
       DispatchQueue.main.async {
@@ -28,7 +41,7 @@ extension Query {
 
   public func getDocuments(source: FirestoreSource = .default) async throws -> QuerySnapshot {
     try await withCheckedThrowingContinuation { continuation in
-      let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(self, source)
+      let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(_asQuery, source)
       future.setCompletion({
         let (snapshot, error) = future.resultAndError
         if let error {
@@ -48,7 +61,7 @@ extension Query {
     typealias ListenerCallback = (QuerySnapshot?, Error?) -> Void
     let boxed = Unmanaged.passRetained(listener as AnyObject)
     let instance = swift_firebase.swift_cxx_shims.firebase.firestore.query_add_snapshot_listener(
-      self, { snapshot, errorCode, errorMessage, pvListener in
+      _asQuery, { snapshot, errorCode, errorMessage, pvListener in
         let callback = Unmanaged<AnyObject>.fromOpaque(pvListener!).takeUnretainedValue() as! ListenerCallback
 
         let error = NSError.firestore(errorCode, errorMessage: errorMessage)
@@ -79,37 +92,37 @@ extension Query {
 
   public func whereField(_ field: String, isEqualTo value: Any) -> Query {
     swift_firebase.swift_cxx_shims.firebase.firestore.query_where_equal_to(
-      self, std.string(field), firestoreValueOrFail(value)
+      _asQuery, std.string(field), firestoreValueOrFail(value)
     )
   }
 
   public func whereField(_ field: String, isNotEqualTo value: Any) -> Query {
     swift_firebase.swift_cxx_shims.firebase.firestore.query_where_not_equal_to(
-      self, std.string(field), firestoreValueOrFail(value)
+      _asQuery, std.string(field), firestoreValueOrFail(value)
     )
   }
 
   public func whereField(_ field: String, isLessThan value: Any) -> Query {
     swift_firebase.swift_cxx_shims.firebase.firestore.query_where_less_than(
-      self, std.string(field), firestoreValueOrFail(value)
+      _asQuery, std.string(field), firestoreValueOrFail(value)
     )
   }
 
   public func whereField(_ field: String, isLessThanOrEqualTo value: Any) -> Query {
     swift_firebase.swift_cxx_shims.firebase.firestore.query_where_less_than_or_equal_to(
-      self, std.string(field), firestoreValueOrFail(value)
+      _asQuery, std.string(field), firestoreValueOrFail(value)
     )
   }
 
   public func whereField(_ field: String, isGreaterThan value: Any) -> Query {
     swift_firebase.swift_cxx_shims.firebase.firestore.query_where_greater_than(
-      self, std.string(field), firestoreValueOrFail(value)
+      _asQuery, std.string(field), firestoreValueOrFail(value)
     )
   }
 
   public func whereField(_ field: String, isGreaterThanOrEqualTo value: Any) -> Query {
     swift_firebase.swift_cxx_shims.firebase.firestore.query_where_greater_than_or_equal_to(
-      self, std.string(field), firestoreValueOrFail(value)
+      _asQuery, std.string(field), firestoreValueOrFail(value)
     )
   }
 

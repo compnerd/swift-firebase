@@ -12,4 +12,14 @@ extension CollectionReference {
   public func document(_ path: String) -> DocumentReference {
     swift_firebase.swift_cxx_shims.firebase.firestore.collection_document(self, std.string(path))
   }
+
+  public var path: String {
+    String(swift_firebase.swift_cxx_shims.firebase.firestore.collection_path(self))
+  }
+}
+
+extension CollectionReference: QueryProtocol {
+  public var _asQuery: Query {
+    swift_firebase.swift_cxx_shims.firebase.firestore.collection_as_query(self)
+  }
 }
