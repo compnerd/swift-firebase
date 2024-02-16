@@ -1,6 +1,22 @@
 // swift-tools-version:5.9
 
 import PackageDescription
+import Foundation
+import WinSDK
+
+let swiftc = "swiftc.exe".withCString(encodedAs: UTF16.self) { pwszCompiler in
+  let dwLength = SearchPathW(nil, pwszCompiler, nil, 0, nil, nil)
+  return withUnsafeTemporaryAllocation(of: WCHAR.self, capacity: Int(dwLength) + 1) {
+    _ = SearchPathW(nil, pwszCompiler, nil, dwLength + 1, $0.baseAddress, nil)
+    return String(decodingCString: $0.baseAddress!, as: UTF16.self)
+  }
+}
+let include = URL(fileURLWithPath: swiftc).deletingLastPathComponent()
+                                          .deletingLastPathComponent()
+                                          .appendingPathComponent("include")
+                                          .withUnsafeFileSystemRepresentation {
+  String(cString: $0!)
+}
 
 let SwiftFirebase =
     Package(name: "SwiftFirebase",
@@ -23,12 +39,14 @@ let SwiftFirebase =
                       publicHeadersPath: "include",
                       cSettings: [
                         .headerSearchPath("../../third_party/firebase-development/usr/include"),
+                        .unsafeFlags(["-I", include]),
                       ],
                       cxxSettings: [
                         .define("__swift__"),
                         .define("INTERNAL_EXPERIMENTAL"),
                         .define("_CRT_SECURE_NO_WARNINGS",
                                 .when(platforms: [.windows])),
+                        .unsafeFlags(["-I", include]),
                       ],
                       linkerSettings: [
                         .unsafeFlags([
@@ -53,6 +71,7 @@ let SwiftFirebase =
                       ],
                       swiftSettings: [
                         .interoperabilityMode(.Cxx),
+                        .unsafeFlags(["-Xcc", "-I\(include)"]),
                       ]),
               .target(name: "FirebaseAuth",
                       dependencies: ["firebase", "FirebaseCore"],
@@ -64,6 +83,7 @@ let SwiftFirebase =
                       ],
                       swiftSettings: [
                         .interoperabilityMode(.Cxx),
+                        .unsafeFlags(["-Xcc", "-I\(include)"]),
                       ]),
               .target(name: "FirebaseFirestore",
                       dependencies: ["firebase", "FirebaseCore"],
@@ -80,6 +100,7 @@ let SwiftFirebase =
                       ],
                       swiftSettings: [
                         .interoperabilityMode(.Cxx),
+                        .unsafeFlags(["-Xcc", "-I\(include)"]),
                       ],
                       linkerSettings: [
                         .unsafeFlags([
@@ -155,6 +176,7 @@ let SwiftFirebase =
                                 ],
                                 swiftSettings: [
                                   .interoperabilityMode(.Cxx),
-                                  .unsafeFlags(["-parse-as-library"])
+                                  .unsafeFlags(["-parse-as-library"]),
+                                  .unsafeFlags(["-Xcc", "-I\(include)"]),
                                 ])
             ])
