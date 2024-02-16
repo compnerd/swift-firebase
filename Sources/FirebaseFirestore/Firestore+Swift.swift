@@ -34,6 +34,63 @@ extension Firestore {
   public func collection(_ collectionPath: String) -> CollectionReference {
     swift_firebase.swift_cxx_shims.firebase.firestore.firestore_collection(self, std.string(collectionPath))
   }
+
+  public func runTransaction(_ updateBlock: @escaping (Transaction, UnsafePointer<NSError?>?) -> Any?, completion: @escaping (Any?, Error?) -> Void) {
+    runTransaction(with: nil, block: updateBlock, completion: completion)
+  }
+
+  public func runTransaction(
+    with options: TransactionOptions?,
+    block updateBlock: @escaping (Transaction, UnsafePointer<NSError?>?) -> Any?,
+    completion: @escaping (Any?, Error?) -> Void
+  ) {
+    let context = TransactionContext(updateBlock: updateBlock)
+    let boxed = Unmanaged.passRetained(context as AnyObject)
+    let future = swift_firebase.swift_cxx_shims.firebase.firestore.firestore_run_transaction(
+      self, options ?? .init(), { transaction, pErrorMessage, pvUpdateBlock in
+        let context = Unmanaged<AnyObject>.fromOpaque(pvUpdateBlock!).takeUnretainedValue() as! TransactionContext
+
+        // Instead of trying to relay the generated `NSError` through firebase's `Error` type
+        // and error message string, just store the `NSError` on `context` and access it later.
+        // We then only need to tell firebase if the update block succeeded or failed and can
+        // just not bother setting `pErrorMessage`.
+
+        // It is expected to run `updateBlock` on whatever thread this happens to be. This is
+        // consistent with the behavior of the ObjC API as well.
+
+        // Since we could run `updateBlock` multiple times, we need to take care to reset any
+        // residue from previous runs. That means clearing out this error field.
+        context.error = nil
+
+        withUnsafePointer(to: context.error) { pError in
+          context.result = context.updateBlock(transaction!.pointee, pError)
+        }
+
+        return context.error != nil ? firebase.firestore.kErrorNone : firebase.firestore.kErrorCancelled
+      },
+      boxed.toOpaque()
+    )
+    future.setCompletion({
+      completion(context.result, context.error)
+      boxed.release()
+    })
+  }
+
+  public func batch() -> WriteBatch {
+    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_batch(self)
+  }
+
+  private class TransactionContext {
+    typealias UpdateBlock = (Transaction, UnsafePointer<NSError?>?) -> Any?
+
+    let updateBlock: UpdateBlock
+    var result: Any?
+    var error: NSError?
+
+    init(updateBlock: @escaping UpdateBlock) {
+      self.updateBlock = updateBlock
+    }
+  }
 }
 
 // An extension that adds the encoder and decoder functions required

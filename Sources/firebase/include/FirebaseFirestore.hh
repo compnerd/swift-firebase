@@ -3,14 +3,19 @@
 #ifndef firebase_include_FirebaseFirestore_hh
 #define firebase_include_FirebaseFirestore_hh
 
+#include <string>
+#include <utility>
+
 #include <firebase/firestore.h>
 
 #include "FirebaseCore.hh"
+#include "TransactionWeakReference.hh"
 
 // Functions defined in this namespace are used to get around the lack of
 // virtual function support currently in Swift. As that support changes
 // these functions will go away whenever possible.
 namespace swift_firebase::swift_cxx_shims::firebase::firestore {
+
 inline ::firebase::firestore::Settings
 firestore_settings(::firebase::firestore::Firestore *firestore) {
   return firestore->settings();
@@ -26,6 +31,34 @@ inline ::firebase::firestore::CollectionReference
 firestore_collection(::firebase::firestore::Firestore *firestore,
                      const ::std::string &collection_path) {
   return firestore->Collection(collection_path);
+}
+
+typedef ::firebase::firestore::Error (*FirebaseRunTransactionUpdateCallback)(
+    TransactionWeakReference *transaction,
+    std::string& error_message,
+    void *user_data);
+inline VoidFuture
+firestore_run_transaction(
+    ::firebase::firestore::Firestore *firestore,
+    ::firebase::firestore::TransactionOptions options,
+    FirebaseRunTransactionUpdateCallback update_callback,
+    void *user_data) {
+  return VoidFuture::From(
+      firestore->RunTransaction(options, [update_callback, user_data](
+          ::firebase::firestore::Transaction& transaction,
+          std::string& error_message
+      ) -> ::firebase::firestore::Error {
+        TransactionWeakReference transaction_ref(&transaction);
+        ::firebase::firestore::Error error =
+            update_callback(&transaction_ref, error_message, user_data);
+        transaction_ref.reset();
+        return error;
+      }));
+}
+
+inline ::firebase::firestore::WriteBatch
+firestore_batch(::firebase::firestore::Firestore *firestore) {
+  return firestore->batch();
 }
 
 // MARK: - DocumentReference
@@ -277,6 +310,46 @@ query_snapshot_documents(const ::firebase::firestore::QuerySnapshot& snapshot) {
 inline std::size_t
 query_snapshot_size(const ::firebase::firestore::QuerySnapshot& snapshot) {
   return snapshot.size();
+}
+
+// MARK: WriteBatch
+
+inline ::firebase::firestore::WriteBatch&
+write_batch_set(
+    ::firebase::firestore::WriteBatch write_batch,
+    const ::firebase::firestore::DocumentReference& document,
+    const ::firebase::firestore::MapFieldValue& data,
+    const ::firebase::firestore::SetOptions& options =
+        ::firebase::firestore::SetOptions()) {
+  return write_batch.Set(document, data, options);
+}
+
+inline ::firebase::firestore::WriteBatch&
+write_batch_update(
+    ::firebase::firestore::WriteBatch write_batch,
+    const ::firebase::firestore::DocumentReference& document,
+    const ::firebase::firestore::MapFieldValue& data) {
+  return write_batch.Update(document, data);
+}
+
+inline ::firebase::firestore::WriteBatch&
+write_batch_update(
+    ::firebase::firestore::WriteBatch write_batch,
+    const ::firebase::firestore::DocumentReference& document,
+    const ::firebase::firestore::MapFieldPathValue& data) {
+  return write_batch.Update(document, data);
+}
+
+inline ::firebase::firestore::WriteBatch&
+write_batch_delete(
+    ::firebase::firestore::WriteBatch write_batch,
+    const ::firebase::firestore::DocumentReference& document) {
+  return write_batch.Delete(document);
+}
+
+inline VoidFuture
+write_batch_commit(::firebase::firestore::WriteBatch write_batch) {
+  return VoidFuture::From(write_batch.Commit());
 }
 
 } // namespace swift_firebase::swift_cxx_shims::firebase::firestore

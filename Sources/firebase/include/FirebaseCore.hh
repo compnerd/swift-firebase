@@ -21,6 +21,12 @@ class SWIFT_CONFORMS_TO_PROTOCOL(FirebaseCore.FutureProtocol)
 
   Future(const ::firebase::Future<R>& rhs) : ::firebase::Future<R>(rhs) {}
 
+  // Allow explicit conversion from `Future<void>` in support of `VoidFuture`.
+  static Future From(const ::firebase::Future<void>& other) {
+    static_assert(sizeof(::firebase::Future<void>) == sizeof(::firebase::Future<R>));
+    return Future(*reinterpret_cast<const ::firebase::Future<R>*>(&other));
+  }
+  
   void OnCompletion(
       _Nonnull FutureCompletionType completion,
       _Nullable void* user_data) const {
@@ -30,6 +36,10 @@ class SWIFT_CONFORMS_TO_PROTOCOL(FirebaseCore.FutureProtocol)
         });
   }
 };
+
+// As a workaround, use `int` here instead of `void` for futures with no
+// result. Swift is not able to handle a `ResultType` of `void`.
+typedef Future<int> VoidFuture;
 
 } // namespace swift_firebase::swift_cxx_shims::firebase
 

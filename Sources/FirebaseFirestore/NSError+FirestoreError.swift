@@ -8,11 +8,18 @@ extension NSError {
   internal static func firestore(_ error: firebase.firestore.Error?, errorMessage: UnsafePointer<CChar>? = nil) -> NSError? {
     guard let actualError = error, actualError.rawValue != 0 else { return nil }
 
+    var errorMessageString: String?
+    if let errorMessage {
+      errorMessageString = .init(cString: errorMessage)
+    }
+    return firestore(actualError, errorMessage: errorMessageString)
+  }
+
+  internal static func firestore(_ error: firebase.firestore.Error, errorMessage: String?) -> NSError {
     var userInfo = [String: Any]()
     if let errorMessage {
-      userInfo[NSLocalizedDescriptionKey] = String(cString: errorMessage)
+      userInfo[NSLocalizedDescriptionKey] = errorMessage
     }
-
-    return NSError(domain: "firebase.firestore", code: Int(actualError.rawValue), userInfo: userInfo)
+    return NSError(domain: "firebase.firestore", code: Int(error.rawValue), userInfo: userInfo)
   }
 }
