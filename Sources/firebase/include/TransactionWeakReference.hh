@@ -32,28 +32,28 @@ class TransactionWeakReference {
   void Set(const ::firebase::firestore::DocumentReference& document,
            const ::firebase::firestore::MapFieldValue& data,
            const ::firebase::firestore::SetOptions& options =
-              ::firebase::firestore::SetOptions()) {
+              ::firebase::firestore::SetOptions()) const {
     container_->transaction->Set(document, data, options);
   }
 
   void Update(const ::firebase::firestore::DocumentReference& document,
-              const ::firebase::firestore::MapFieldValue& data) {
+              const ::firebase::firestore::MapFieldValue& data) const {
     container_->transaction->Update(document, data);
   }
 
   void Update(const ::firebase::firestore::DocumentReference& document,
-              const ::firebase::firestore::MapFieldPathValue& data) {
+              const ::firebase::firestore::MapFieldPathValue& data) const {
     container_->transaction->Update(document, data);
   }
 
-  void Delete(const ::firebase::firestore::DocumentReference& document) {
+  void Delete(const ::firebase::firestore::DocumentReference& document) const {
     container_->transaction->Delete(document);
   }
 
   ::firebase::firestore::DocumentSnapshot Get(
       const ::firebase::firestore::DocumentReference& document,
       ::firebase::firestore::Error* error_code,
-      std::string* error_message) {
+      std::string* error_message) const {
     return container_->transaction->Get(document, error_code, error_message);
   }
 

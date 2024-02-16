@@ -10,6 +10,10 @@ import Foundation
 
 public typealias Firestore = UnsafeMutablePointer<firebase.firestore.Firestore>
 
+// On Apple platforms, this is defined by Foundation using AutoreleasingUnsafeMutablePointer.
+// That type is specific to the ObjC runtime, so we don't have access to it. Use this instead.
+public typealias NSErrorPointer = UnsafeMutablePointer<NSError?>?
+
 extension Firestore {
   public static func firestore() -> Firestore {
     guard let application = firebase.App.GetInstance() else {
@@ -35,13 +39,13 @@ extension Firestore {
     swift_firebase.swift_cxx_shims.firebase.firestore.firestore_collection(self, std.string(collectionPath))
   }
 
-  public func runTransaction(_ updateBlock: @escaping (Transaction, UnsafePointer<NSError?>?) -> Any?, completion: @escaping (Any?, Error?) -> Void) {
+  public func runTransaction(_ updateBlock: @escaping (Transaction, NSErrorPointer) -> Any?, completion: @escaping (Any?, Error?) -> Void) {
     runTransaction(with: nil, block: updateBlock, completion: completion)
   }
 
   public func runTransaction(
     with options: TransactionOptions?,
-    block updateBlock: @escaping (Transaction, UnsafePointer<NSError?>?) -> Any?,
+    block updateBlock: @escaping (Transaction, NSErrorPointer) -> Any?,
     completion: @escaping (Any?, Error?) -> Void
   ) {
     let context = TransactionContext(updateBlock: updateBlock)
@@ -62,9 +66,7 @@ extension Firestore {
         // residue from previous runs. That means clearing out this error field.
         context.error = nil
 
-        withUnsafePointer(to: context.error) { pError in
-          context.result = context.updateBlock(transaction!.pointee, pError)
-        }
+        context.result = context.updateBlock(transaction!.pointee, &context.error)
 
         return context.error != nil ? firebase.firestore.kErrorNone : firebase.firestore.kErrorCancelled
       },
@@ -81,7 +83,7 @@ extension Firestore {
   }
 
   private class TransactionContext {
-    typealias UpdateBlock = (Transaction, UnsafePointer<NSError?>?) -> Any?
+    typealias UpdateBlock = (Transaction, NSErrorPointer) -> Any?
 
     let updateBlock: UpdateBlock
     var result: Any?

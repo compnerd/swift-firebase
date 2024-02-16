@@ -9,35 +9,35 @@ import Foundation
 public typealias Transaction = swift_firebase.swift_cxx_shims.firebase.firestore.TransactionWeakReference
 
 extension Transaction {
-  public mutating func setData(_ data: [String : Any], forDocument document: DocumentReference) -> Transaction {
+  @discardableResult public func setData(_ data: [String : Any], forDocument document: DocumentReference) -> Transaction {
     setData(data, forDocument: document, merge: false)
   }
 
-  public mutating func setData(_ data: [String : Any], forDocument document: DocumentReference, merge: Bool) -> Transaction {
-    assert(is_valid())
+  @discardableResult public func setData(_ data: [String : Any], forDocument document: DocumentReference, merge: Bool) -> Transaction {
+    guard is_valid() else { fatalError("Transaction accessed outside of updateBlock") }
     self.Set(document, FirestoreDataConverter.firestoreValue(document: data), merge ? .Merge() : .init())
     return self
   }
 
   /* TODO: implement
-  public mutating func setData(_ data: [String : Any], forDocument document: DocumentReference, mergeFields: [Any]) -> Transaction {
+  @discardableResult public func setData(_ data: [String : Any], forDocument document: DocumentReference, mergeFields: [Any]) -> Transaction {
   }
   */
 
-  public mutating func updateData(_ fields: [String : Any], forDocument document: DocumentReference) -> Transaction {
-    assert(is_valid())
+  @discardableResult public func updateData(_ fields: [String : Any], forDocument document: DocumentReference) -> Transaction {
+    guard is_valid() else { fatalError("Transaction accessed outside of updateBlock") }
     self.Update(document, FirestoreDataConverter.firestoreValue(document: fields))
     return self
   }
 
-  public mutating func deleteDocument(_ document: DocumentReference) -> Transaction {
-    assert(is_valid())
+  @discardableResult public func deleteDocument(_ document: DocumentReference) -> Transaction {
+    guard is_valid() else { fatalError("Transaction accessed outside of updateBlock") }
     Delete(document)
     return self
   }
 
-  public mutating func getDocument(_ document: DocumentReference) throws -> DocumentSnapshot {
-    assert(is_valid())
+  public func getDocument(_ document: DocumentReference) throws -> DocumentSnapshot {
+    guard is_valid() else { fatalError("Transaction accessed outside of updateBlock") }
 
     var error = firebase.firestore.kErrorNone
     var errorMessage = std.string()
