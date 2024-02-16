@@ -4,8 +4,8 @@ import Foundation
 import Cxx
 
 internal struct FirestoreDataConverter {
-  static func value(workaround: swift_firebase.swift_cxx_shims.firebase.firestore.MapFieldValue_Workaround) -> [String: Any]? {
-    guard workaround.keys.size() == workaround.values.size() else { return nil }
+  static func value(workaround: swift_firebase.swift_cxx_shims.firebase.firestore.MapFieldValue_Workaround) -> [String: Any] {
+    guard workaround.keys.size() == workaround.values.size() else { fatalError("Internal error: keys and values should be the same size.") }
 
     return Dictionary(uniqueKeysWithValues: zip(workaround.keys, workaround.values).lazy.compactMap {
       guard let converted = FirestoreDataConverter.value(field: $0.1) else { return nil }

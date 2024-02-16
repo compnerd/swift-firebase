@@ -18,15 +18,20 @@ public typealias FieldValue = firebase.firestore.FieldValue
 
 extension DocumentSnapshot {
   public var reference: DocumentReference {
-    swift_firebase.swift_cxx_shims.firebase.firestore.snapshot_reference(self)
+    swift_firebase.swift_cxx_shims.firebase.firestore.document_snapshot_reference(self)
   }
 
   public var exists: Bool {
-    swift_firebase.swift_cxx_shims.firebase.firestore.snapshot_exists(self)
+    swift_firebase.swift_cxx_shims.firebase.firestore.document_snapshot_exists(self)
   }
 
-  public func data(with behavior: ServerTimestampBehavior) -> [String: Any]? {
-    let data = swift_firebase.swift_cxx_shims.firebase.firestore.snapshot_get_data_workaround(self, behavior)
+  public var documentID: String {
+    String(swift_firebase.swift_cxx_shims.firebase.firestore.document_snapshot_id(self).pointee)
+  }
+
+  public func data(with behavior: ServerTimestampBehavior = .default) -> [String: Any]? {
+    guard exists else { return nil }
+    let data = swift_firebase.swift_cxx_shims.firebase.firestore.document_snapshot_get_data_workaround(self, behavior)
     return FirestoreDataConverter.value(workaround: data)
   }
 }

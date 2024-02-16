@@ -102,12 +102,12 @@ document_collection(::firebase::firestore::DocumentReference document,
 // MARK: - DocumentSnapshot
 
 inline ::firebase::firestore::DocumentReference
-snapshot_reference(const ::firebase::firestore::DocumentSnapshot snapshot) {
+document_snapshot_reference(const ::firebase::firestore::DocumentSnapshot snapshot) {
   return snapshot.reference();
 }
 
 inline bool
-snapshot_exists(const ::firebase::firestore::DocumentSnapshot &snapshot) {
+document_snapshot_exists(const ::firebase::firestore::DocumentSnapshot &snapshot) {
   return snapshot.exists();
 }
 
@@ -131,7 +131,7 @@ inline MapFieldValue_Workaround map_field_value_to_workaround(
   return std::move(data);
 }
 
-inline MapFieldValue_Workaround snapshot_get_data_workaround(
+inline MapFieldValue_Workaround document_snapshot_get_data_workaround(
     const ::firebase::firestore::DocumentSnapshot snapshot,
     const ::firebase::firestore::DocumentSnapshot::ServerTimestampBehavior
         stb) {
@@ -145,6 +145,11 @@ field_value_workaround(::firebase::firestore::MapFieldValue value) {
   return map_field_value_to_workaround(value);
 }
 #endif
+
+inline const ::std::string&
+document_snapshot_id(::firebase::firestore::DocumentSnapshot snapshot) {
+  return snapshot.id();
+}
 
 inline ::firebase::firestore::DocumentReference
 collection_document(::firebase::firestore::CollectionReference collection,
