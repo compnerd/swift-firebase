@@ -6,7 +6,7 @@ import firebase
 public typealias FieldValue = firebase.firestore.FieldValue
 
 extension FieldValue {
-  public static func serverTimestamp() {
+  public static func serverTimestamp() -> Self {
     ServerTimestamp()
   }
 }
