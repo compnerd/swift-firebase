@@ -20,7 +20,7 @@ internal struct FirestoreDataConverter {
     case .boolean:
       return field.boolean_value()
     case .integer:
-      return field.integer_value()
+      return Int64(field.integer_value())
     case .double:
       return field.double_value()
     case .timestamp:
@@ -70,8 +70,8 @@ internal struct FirestoreDataConverter {
       guard let bool = field as? Bool else { return nil }
       return firebase.firestore.FieldValue.Boolean(bool)
     case is Int:
-      guard let int = field as? Int64 else { return nil }
-      return firebase.firestore.FieldValue.Integer(int)
+      guard let int = field as? Int else { return nil }
+      return firebase.firestore.FieldValue.Integer(Int64(int))
     case is Double:
       guard let double = field as? Double else { return nil }
       return firebase.firestore.FieldValue.Double(double)
