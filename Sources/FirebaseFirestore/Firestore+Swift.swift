@@ -68,7 +68,7 @@ extension Firestore {
 
         context.result = context.updateBlock(transaction!.pointee, &context.error)
 
-        return context.error != nil ? firebase.firestore.kErrorNone : firebase.firestore.kErrorCancelled
+        return context.error == nil ? firebase.firestore.kErrorNone : firebase.firestore.kErrorCancelled
       },
       boxed.toOpaque()
     )
