@@ -45,7 +45,7 @@ extension Transaction {
     let snapshot = Get(document, &error, &errorMessage)
 
     if error != firebase.firestore.kErrorNone {
-      throw NSError.firestore(error, errorMessage: String(errorMessage))
+      throw FirestoreErrorCode(error, errorMessage: String(errorMessage))
     }
 
     return snapshot

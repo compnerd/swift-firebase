@@ -68,7 +68,7 @@ extension DocumentReference {
       self, { snapshot, errorCode, errorMessage, pvListener in
         let callback = Unmanaged<AnyObject>.fromOpaque(pvListener!).takeUnretainedValue() as! ListenerCallback
 
-        let error = NSError.firestore(errorCode, errorMessage: errorMessage)
+        let error = FirestoreErrorCode(errorCode, errorMessage: errorMessage)
         // We only return a snapshot if the error code isn't 0 (aka the 'ok' error code)
         let returned = error == nil ? snapshot?.pointee : nil
 
