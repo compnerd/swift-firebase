@@ -6,18 +6,22 @@ public struct FirestoreErrorCode: Error {
   public let code: Code
   public let localizedDescription: String
 
-  public init(_ error: firebase.firestore.Error, errorMessage: String?) {
+  init(_ error: firebase.firestore.Error, errorMessage: String?) {
     code = error
     localizedDescription = errorMessage ?? "\(code.rawValue)"
   }
 
-  public init?(_ error: firebase.firestore.Error?, errorMessage: UnsafePointer<CChar>? = nil) {
+  init?(_ error: firebase.firestore.Error?, errorMessage: UnsafePointer<CChar>?) {
     guard let actualError = error, actualError.rawValue != 0 else { return nil }
     var errorMessageString: String?
     if let errorMessage {
       errorMessageString = .init(cString: errorMessage)
     }
     self.init(actualError, errorMessage: errorMessageString)
+  }
+
+  public init(_ code: Code) {
+    self.init(code, errorMessage: nil)
   }
 }
 
