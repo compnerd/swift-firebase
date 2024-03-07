@@ -12,7 +12,7 @@ public typealias EmailAuthProvider = firebase.auth.EmailAuthProvider
 public typealias Credential = firebase.auth.Credential
 
 extension EmailAuthProvider {
-    static func credential(withEmail email: String, password: String) -> Credential {
+    public static func credential(withEmail email: String, password: String) -> Credential {
         GetCredential(email, password)
     }
 }
