@@ -9,6 +9,7 @@ import firebase
 import FirebaseCore
 
 public typealias User = firebase.auth.User
+public typealias AuthResult = firebase.auth.AuthResult
 
 public protocol UserInfo {
   var providerID: String { get }
@@ -19,6 +20,7 @@ public protocol UserInfo {
   var phoneNumber: String? { get }
 }
 
+// TODO(WPP-1581): Improve the API to match the ObjC one better.
 extension User {
   public var isAnonymous: Bool {
     self.is_anonymous()
@@ -84,10 +86,26 @@ extension User {
     }
   }
 
-  // public mutating func reauthenticate(with credential: AuthCredential) async throws
-  //     -> AuthResult {
-  //   fatalError("\(#function) not yet implemented")
-  // }
+  public mutating func reauthenticate(with credential: Credential) async throws
+      -> AuthResult {
+      typealias Promise = CheckedContinuation<firebase.auth.AuthResult, any Error>
+      return try await withCheckedThrowingContinuation { (continuation: Promise) in
+        let future = self.ReauthenticateAndRetrieveData(credential)
+        withUnsafePointer(to: continuation) { continuation in
+          future.OnCompletion_SwiftWorkaround({ future, pvContinuation in
+            let pContinuation = pvContinuation?.assumingMemoryBound(to: Promise.self)
+            if future.pointee.error() == 0 {
+              pContinuation.pointee.resume(returning: future.pointee.__resultUnsafe().pointee)
+            } else {
+              let code = future.pointee.error()
+              let message = String(cString: future.pointee.__error_messageUnsafe()!)
+              pContinuation.pointee.resume(throwing: FirebaseError(code: code, message: message))
+            }
+          }, UnsafeMutableRawPointer(mutating: continuation))
+        }
+        future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
+      }
+  }
 
   // -reauthenticateWithProvider:UIDelegate:completion:
 
