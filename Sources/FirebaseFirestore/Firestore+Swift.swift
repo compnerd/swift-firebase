@@ -12,7 +12,7 @@ public typealias Firestore = UnsafeMutablePointer<firebase.firestore.Firestore>
 
 // On Apple platforms, this is defined by Foundation using AutoreleasingUnsafeMutablePointer.
 // That type is specific to the ObjC runtime, so we don't have access to it. Use this instead.
-public typealias NSErrorPointer = UnsafeMutablePointer<NSError?>?
+public typealias NSErrorPointer = UnsafeMutablePointer<Error?>?
 
 extension Firestore {
   public static func firestore() -> Firestore {
@@ -91,7 +91,7 @@ extension Firestore {
 
     let updateBlock: UpdateBlock
     var result: Any?
-    var error: NSError?
+    var error: Error?
 
     init(updateBlock: @escaping UpdateBlock) {
       self.updateBlock = updateBlock
