@@ -10,3 +10,5 @@ extension FieldValue {
     ServerTimestamp()
   }
 }
+
+extension FieldValue: Equatable {}
