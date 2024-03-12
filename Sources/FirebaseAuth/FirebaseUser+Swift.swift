@@ -8,6 +8,8 @@ import firebase
 @_spi(FirebaseInternal)
 import FirebaseCore
 
+import CxxShim
+
 public typealias User = firebase.auth.User
 public typealias AuthResult = firebase.auth.AuthResult
 
@@ -66,45 +68,64 @@ extension User {
   //   fatalError("\(#function) not yet implemented")
   // }
 
-  public mutating func reload() async throws {
-    typealias Promise = CheckedContinuation<Void, any Error>
-    try await withCheckedThrowingContinuation { (continuation: Promise) in
-      let future = self.Reload()
-      withUnsafePointer(to: continuation) { continuation in
-        future.OnCompletion_SwiftWorkaround({ future, pvContinuation in
-          let pContinuation = pvContinuation?.assumingMemoryBound(to: Promise.self)
-          if future.pointee.error() == 0 {
-            pContinuation.pointee.resume()
-          } else {
-            let code = future.pointee.error()
-            let message = String(cString: future.pointee.__error_messageUnsafe()!)
-            pContinuation.pointee.resume(throwing: FirebaseError(code: code, message: message))
-          }
-        }, UnsafeMutableRawPointer(mutating: continuation))
+  public mutating func reload(completion: ((Error?) -> Void)?) {
+    reloadImpl() { error in
+      if let completion {
+        DispatchQueue.main.async {
+          completion(error)
+        }
       }
-      future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
     }
   }
 
-  public mutating func reauthenticate(with credential: Credential) async throws
-      -> AuthResult {
-      typealias Promise = CheckedContinuation<firebase.auth.AuthResult, any Error>
-      return try await withCheckedThrowingContinuation { (continuation: Promise) in
-        let future = self.ReauthenticateAndRetrieveData(credential)
-        withUnsafePointer(to: continuation) { continuation in
-          future.OnCompletion_SwiftWorkaround({ future, pvContinuation in
-            let pContinuation = pvContinuation?.assumingMemoryBound(to: Promise.self)
-            if future.pointee.error() == 0 {
-              pContinuation.pointee.resume(returning: future.pointee.__resultUnsafe().pointee)
-            } else {
-              let code = future.pointee.error()
-              let message = String(cString: future.pointee.__error_messageUnsafe()!)
-              pContinuation.pointee.resume(throwing: FirebaseError(code: code, message: message))
-            }
-          }, UnsafeMutableRawPointer(mutating: continuation))
+  public mutating func reload() async throws {
+    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+      reloadImpl() { error in
+        if let error {
+          continuation.resume(throwing: error)
+        } else {
+          continuation.resume()
         }
-        future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
       }
+    }
+  }
+
+  private mutating func reloadImpl(completion: @escaping (Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_reload(self)
+    future.setCompletion({
+      let (_, error) = future.resultAndError
+      completion(error)
+    })
+  }
+
+  public mutating func reauthenticate(with credential: Credential, completion: ((AuthResult?, Error?) -> Void)?) {
+    reauthenticateImpl(with: credential) { result, error in
+      if let completion {
+        DispatchQueue.main.async {
+          completion(result, error)
+        }
+      }
+    }
+  }
+
+  public mutating func reauthenticate(with credential: Credential) async throws {
+    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+      reauthenticateImpl(with: credential) { result, error in
+        if let error {
+          continuation.resume(throwing: error)
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+
+  public mutating func reauthenticateImpl(with credential: Credential, completion: @escaping (AuthResult?, Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_reauthenticate_and_retrieve_data(self, credential)
+    future.setCompletion({
+      let (result, error) = future.resultAndError
+      completion(result, error)
+    })
   }
 
   // -reauthenticateWithProvider:UIDelegate:completion:
@@ -122,25 +143,41 @@ extension User {
     return try await idTokenForcingRefresh(false)
   }
 
+  public mutating func idTokenForcingRefresh(_ forceRefresh: Bool, completion: ((String?, Error?) -> Void)?) {
+    idTokenForcingRefreshImpl(forceRefresh) { result, error in
+      if let completion {
+        DispatchQueue.main.async {
+          completion(result, error)
+        }
+      }
+    }
+  }
+
   public mutating func idTokenForcingRefresh(_ forceRefresh: Bool) async throws
       -> String {
-    typealias Promise = CheckedContinuation<String, any Error>
-    return try await withCheckedThrowingContinuation { (continuation: Promise) in
-      let future = self.GetToken(forceRefresh)
-      withUnsafePointer(to: continuation) { continuation in
-        future.OnCompletion_SwiftWorkaround({ future, pvContinuation in
-          let pContinuation = pvContinuation?.assumingMemoryBound(to: Promise.self)
-          if future.pointee.error() == 0 {
-            pContinuation.pointee.resume(returning: String(future.pointee.__resultUnsafe().pointee))
-          } else {
-            let code = future.pointee.error()
-            let message = String(cString: future.pointee.__error_messageUnsafe()!)
-            pContinuation.pointee.resume(throwing: FirebaseError(code: code, message: message))
-          }
-        }, UnsafeMutableRawPointer(mutating: continuation))
+    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, any Error>) in
+      idTokenForcingRefreshImpl(forceRefresh) { result, error in
+        if let error {
+          continuation.resume(throwing: error)
+        } else {
+          continuation.resume(returning: result ?? .init())
+        }
       }
-      future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
     }
+  }
+
+  private mutating func idTokenForcingRefreshImpl(_ forceRefresh: Bool, completion: @escaping (String?, Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_get_token(self, forceRefresh)
+    future.setCompletion({
+      let (result, error) = future.resultAndError
+      let stringResult: String?
+      if let result {
+        stringResult = String(result)
+      } else {
+        stringResult = nil
+      }
+      completion(stringResult, error)
+    })
   }
 
   // public func link(with credential: AuthCredential) async throws
@@ -154,24 +191,35 @@ extension User {
     fatalError("\(#function) not yet implemented")
   }
 
-  public mutating func sendEmailVerification() async throws {
-    typealias Promise = CheckedContinuation<Void, any Error>
-    try await withCheckedThrowingContinuation { (continuation: Promise) in
-      let future = self.SendEmailVerification()
-      withUnsafePointer(to: continuation) { continuation in
-        future.OnCompletion_SwiftWorkaround({ future, pvContinuation in
-          let pContinuation = pvContinuation?.assumingMemoryBound(to: Promise.self)
-          if future.pointee.error() == 0 {
-            pContinuation.pointee.resume()
-          } else {
-            let code = future.pointee.error()
-            let message = String(cString: future.pointee.__error_messageUnsafe()!)
-            pContinuation.pointee.resume(throwing: FirebaseError(code: code, message: message))
-          }
-        }, UnsafeMutableRawPointer(mutating: continuation))
+  public mutating func sendEmailVerification(completion: ((Error?) -> Void)?) {
+    sendEmailVerificationImpl() { error in
+      if let completion {
+        DispatchQueue.main.async {
+          completion(error)
+        }
       }
-      future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
     }
+  }
+
+  public mutating func sendEmailVerification() async throws {
+    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+      sendEmailVerificationImpl() { error in
+        if let error {
+          continuation.resume(throwing: error)
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+
+  public mutating func sendEmailVerificationImpl(completion: @escaping (Error?) -> Void) {
+    //let future = self.SendEmailVerification()
+    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_send_email_verification(self)
+    future.setCompletion({
+      let (_, error) = future.resultAndError
+      completion(error)
+    })
   }
 
   // public func sendEmailVerification(with actionCodeSettings: ActionCodeSettings) async throws {

@@ -5,6 +5,8 @@
 
 #include <firebase/auth.h>
 
+#include "FirebaseCore.hh"
+
 // https://github.com/apple/swift/issues/69959
 #if __has_include(<swift/bridging>)
 #include <swift/bridging>
@@ -16,6 +18,7 @@
 #endif
 
 namespace swift_firebase::swift_cxx_shims::firebase::auth {
+
 inline std::string
 user_display_name(const ::firebase::auth::User &user) noexcept {
   return user.display_name();
@@ -41,6 +44,31 @@ user_provider_id(const ::firebase::auth::User &user) noexcept {
 
 inline std::string user_uid(const ::firebase::auth::User &user) noexcept {
   return user.uid();
+}
+
+inline ::swift_firebase::swift_cxx_shims::firebase::VoidFuture
+user_reload(::firebase::auth::User user) {
+  return ::swift_firebase::swift_cxx_shims::firebase::VoidFuture::From(
+      user.Reload());
+}
+
+inline ::swift_firebase::swift_cxx_shims::firebase::Future<
+    ::firebase::auth::AuthResult>
+user_reauthenticate_and_retrieve_data(
+    ::firebase::auth::User user,
+    const ::firebase::auth::Credential& credential) {
+  return user.ReauthenticateAndRetrieveData(credential);
+}
+
+inline ::swift_firebase::swift_cxx_shims::firebase::Future<::std::string>
+user_get_token(::firebase::auth::User user, bool force_refresh) {
+  return user.GetToken(force_refresh);
+}
+
+inline ::swift_firebase::swift_cxx_shims::firebase::VoidFuture
+user_send_email_verification(::firebase::auth::User user) {
+  return ::swift_firebase::swift_cxx_shims::firebase::VoidFuture::From(
+      user.SendEmailVerification());
 }
 
 class SWIFT_UNSAFE_REFERENCE AuthStateListener

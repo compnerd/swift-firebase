@@ -11,11 +11,6 @@ import Foundation
 public typealias DocumentReference = firebase.firestore.DocumentReference
 
 extension DocumentReference {
-  // Use a serial dispatch queue to write mutations from the block-based API.
-  // Passing these futures into the queue as an item should retain them long enough
-  // to do their job, but not block.
-  private static let mutationQueue = DispatchQueue(label: "firebase.firestore.document.mutations")
-
   public var documentID: String {
     String(swift_firebase.swift_cxx_shims.firebase.firestore.document_id(self))
   }
@@ -87,51 +82,36 @@ extension DocumentReference {
     return ListenerRegistration(boxed, instance)
   }
 
-  public func setData(_ data: [String: Any], merge: Bool = false, completion: ((NSError?) -> Void)?) {
-    let boxed = Unmanaged.passRetained(completion as AnyObject)
+  public func setData(_ data: [String: Any], merge: Bool = false, completion: ((Error?) -> Void)?) {
+    setDataImpl(data, merge: merge) { error in
+      if let completion {
+        DispatchQueue.main.async {
+          completion(error)
+        }
+      }
+    }
+  }
+
+  private func setDataImpl(_ data: [String: Any], merge: Bool, completion: @escaping (Error?) -> Void) {
     let converted = FirestoreDataConverter.firestoreValue(document: data)
     let options = merge ? firebase.firestore.SetOptions.Merge() : firebase.firestore.SetOptions()
-
-    Self.mutationQueue.async {
-      let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_set_data(self, converted, options)
-
-      future.OnCompletion_SwiftWorkaround({ future, pvCallback in
-        guard let pCallback = pvCallback, let callback = Unmanaged<AnyObject>.fromOpaque(pCallback).takeUnretainedValue() as? ((NSError?) -> Void)? else {
-          return
-        }
-        if let code = future?.pointee.error(), code != 0 {
-          callback?(NSError(domain: "firebase.firestore.document", code: Int(code)))
-        } else {
-          callback?(nil)
-        }
-      }, UnsafeMutableRawPointer(boxed.toOpaque()))
-
-      future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
-    }
+    let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_set_data(self, converted, options)
+    future.setCompletion({
+      let (_, error) = future.resultAndError
+      completion(error)
+    })
   }
 }
 
 extension DocumentReference {
   public func setData(_ data: [String: Any], merge: Bool = false) async throws {
-    let converted = FirestoreDataConverter.firestoreValue(document: data)
-    let options = merge ? firebase.firestore.SetOptions.Merge() : firebase.firestore.SetOptions()
-
-    typealias Promise = CheckedContinuation<Void, any Error>
-    try await withCheckedThrowingContinuation { (continuation: Promise) in
-      let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_set_data(self, converted, options)
-      withUnsafePointer(to: continuation) { continuation in
-        future.OnCompletion_SwiftWorkaround({ future, pvContinuation in
-          let pContinuation = pvContinuation?.assumingMemoryBound(to: Promise.self)
-          if future.pointee.error() == 0 {
-            pContinuation.pointee.resume()
-          } else {
-            let code = future.pointee.error()
-            let message = String(cString: future.pointee.__error_messageUnsafe()!)
-            pContinuation.pointee.resume(throwing: FirebaseError(code: code, message: message))
-          }
-        }, UnsafeMutableRawPointer(mutating: continuation))
-
-        future.Wait(firebase.FutureBase.kWaitTimeoutInfinite)
+    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+      setDataImpl(data, merge: merge) { error in
+        if let error {
+          continuation.resume(throwing: error)
+        } else {
+          continuation.resume()
+        }
       }
     }
   }

@@ -39,7 +39,7 @@ public extension FutureProtocol {
   }
 
   var result: ResultType? {
-    __resultUnsafe().pointee
+    __resultUnsafe()?.pointee
   }
 
   var errorMessage: String? {

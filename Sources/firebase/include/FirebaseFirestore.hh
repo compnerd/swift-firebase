@@ -37,13 +37,13 @@ typedef ::firebase::firestore::Error (*FirebaseRunTransactionUpdateCallback)(
     TransactionWeakReference *transaction,
     std::string& error_message,
     void *user_data);
-inline VoidFuture
+inline ::swift_firebase::swift_cxx_shims::firebase::VoidFuture
 firestore_run_transaction(
     ::firebase::firestore::Firestore *firestore,
     ::firebase::firestore::TransactionOptions options,
     FirebaseRunTransactionUpdateCallback update_callback,
     void *user_data) {
-  return VoidFuture::From(
+  return ::swift_firebase::swift_cxx_shims::firebase::VoidFuture::From(
       firestore->RunTransaction(options, [update_callback, user_data](
           ::firebase::firestore::Transaction& transaction,
           std::string& error_message
@@ -86,11 +86,12 @@ document_get(const ::firebase::firestore::DocumentReference document,
   return document.Get(source);
 }
 
-inline ::swift_firebase::swift_cxx_shims::firebase::Future<void>
+inline ::swift_firebase::swift_cxx_shims::firebase::VoidFuture
 document_set_data(::firebase::firestore::DocumentReference document,
                   const ::firebase::firestore::MapFieldValue data,
                   const ::firebase::firestore::SetOptions options) {
-  return document.Set(data, options);
+  return ::swift_firebase::swift_cxx_shims::firebase::VoidFuture::From(
+      document.Set(data, options));
 }
 
 inline ::firebase::firestore::CollectionReference
@@ -364,9 +365,10 @@ write_batch_delete(
   return write_batch.Delete(document);
 }
 
-inline VoidFuture
+inline ::swift_firebase::swift_cxx_shims::firebase::VoidFuture
 write_batch_commit(::firebase::firestore::WriteBatch write_batch) {
-  return VoidFuture::From(write_batch.Commit());
+  return ::swift_firebase::swift_cxx_shims::firebase::VoidFuture::From(
+      write_batch.Commit());
 }
 
 } // namespace swift_firebase::swift_cxx_shims::firebase::firestore
