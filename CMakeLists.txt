@@ -97,9 +97,7 @@ add_library(FirebaseFirestore SHARED
 target_compile_options(FirebaseFirestore PRIVATE
   -cxx-interoperability-mode=default)
 target_link_libraries(FirebaseFirestore PUBLIC
-  firebase
-  FirebaseCore)
-target_link_libraries(FirebaseFirestore PRIVATE
+  FirebaseCore
   absl_bad_optional_access
   absl_bad_variant_access
   absl_base
@@ -140,10 +138,11 @@ target_link_libraries(FirebaseFirestore PRIVATE
   address_sorting
   cares
   crypto
+  firebase
+  firebase_rest_lib
   firestore_core
   firestore_nanopb
   firestore_protos_nanopb
-  firebase_rest_lib
   firestore_util
   flatbuffers
   gpr
