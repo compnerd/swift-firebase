@@ -60,7 +60,9 @@ extension DocumentReference {
     typealias ListenerCallback = (DocumentSnapshot?, Error?) -> Void
     let boxed = Unmanaged.passRetained(listener as AnyObject)
     let instance = swift_firebase.swift_cxx_shims.firebase.firestore.document_add_snapshot_listener(
-      self, { snapshot, errorCode, errorMessage, pvListener in
+      includeMetadataChanges,
+      self,
+      { snapshot, errorCode, errorMessage, pvListener in
         let callback = Unmanaged<AnyObject>.fromOpaque(pvListener!).takeUnretainedValue() as! ListenerCallback
 
         let error = FirestoreErrorCode(errorCode, errorMessage: errorMessage)

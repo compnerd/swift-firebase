@@ -176,9 +176,11 @@ typedef void (*DocumentSnapshotListenerTypedCallback)(
     void *user_data);
 inline ::firebase::firestore::ListenerRegistration
 document_add_snapshot_listener(
+    bool include_metadata_changes,
     ::firebase::firestore::DocumentReference document,
     DocumentSnapshotListenerTypedCallback callback, void *user_data) {
   return document.AddSnapshotListener(
+      include_metadata_changes ? ::firebase::firestore::MetadataChanges::kInclude : ::firebase::firestore::MetadataChanges::kExclude,
       [callback, user_data](
           const ::firebase::firestore::DocumentSnapshot &snapshot,
           ::firebase::firestore::Error error_code,
@@ -241,9 +243,11 @@ typedef void (*QuerySnapshotListenerTypedCallback)(
     void *user_data);
 inline ::firebase::firestore::ListenerRegistration
 query_add_snapshot_listener(
+    bool include_metadata_changes,
     ::firebase::firestore::Query query,
     QuerySnapshotListenerTypedCallback callback, void *user_data) {
   return query.AddSnapshotListener(
+      include_metadata_changes ? ::firebase::firestore::MetadataChanges::kInclude : ::firebase::firestore::MetadataChanges::kExclude,
       [callback, user_data](
           const ::firebase::firestore::QuerySnapshot &snapshot,
           ::firebase::firestore::Error error_code,

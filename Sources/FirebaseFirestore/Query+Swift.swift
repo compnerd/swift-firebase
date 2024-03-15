@@ -61,7 +61,9 @@ extension QueryProtocol {
     typealias ListenerCallback = (QuerySnapshot?, Error?) -> Void
     let boxed = Unmanaged.passRetained(listener as AnyObject)
     let instance = swift_firebase.swift_cxx_shims.firebase.firestore.query_add_snapshot_listener(
-      _asQuery, { snapshot, errorCode, errorMessage, pvListener in
+      includeMetadataChanges,
+      _asQuery,
+      { snapshot, errorCode, errorMessage, pvListener in
         let callback = Unmanaged<AnyObject>.fromOpaque(pvListener!).takeUnretainedValue() as! ListenerCallback
 
         let error = FirestoreErrorCode(errorCode, errorMessage: errorMessage)
