@@ -21,6 +21,11 @@ firestore_settings(::firebase::firestore::Firestore *firestore) {
   return firestore->settings();
 }
 
+inline void
+firestore_set_settings(::firebase::firestore::Firestore *firestore, ::firebase::firestore::Settings settings) {
+  return firestore->set_settings(settings);
+}
+
 inline ::firebase::firestore::DocumentReference
 firestore_document(::firebase::firestore::Firestore *firestore,
                    const ::std::string &document_path) {

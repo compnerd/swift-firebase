@@ -8,10 +8,29 @@ import FirebaseCore
 import CxxShim
 import Foundation
 
-public typealias Settings = firebase.firestore.Settings
+public struct FirestoreSettings {
+  var impl: firebase.firestore.Settings
 
-extension Settings: CustomDebugStringConvertible {
+  init(_ impl: firebase.firestore.Settings) {
+    self.impl = impl
+  }
+
+  public init() {
+    impl = .init()
+  }
+
   public var debugDescription: String {
-    String(ToString())
+    String(impl.ToString())
+  }
+
+  public var isPersistenceEnabled: Bool {
+    get {
+      impl.is_persistence_enabled()
+    }
+    set {
+      impl.set_persistence_enabled(newValue)
+    }
   }
 }
+
+extension FirestoreSettings: CustomDebugStringConvertible {}

@@ -8,13 +8,17 @@ import FirebaseCore
 import CxxShim
 import Foundation
 
-public typealias Firestore = UnsafeMutablePointer<firebase.firestore.Firestore>
-
 // On Apple platforms, this is defined by Foundation using AutoreleasingUnsafeMutablePointer.
 // That type is specific to the ObjC runtime, so we don't have access to it. Use this instead.
 public typealias NSErrorPointer = UnsafeMutablePointer<Error?>?
 
-extension Firestore {
+public class Firestore {
+  var impl: UnsafeMutablePointer<firebase.firestore.Firestore>
+
+  init(_ impl: UnsafeMutablePointer<firebase.firestore.Firestore>) {
+    self.impl = impl
+  }
+
   public static func firestore() -> Firestore {
     guard let application = firebase.App.GetInstance() else {
       fatalError("no default application")
@@ -28,15 +32,24 @@ extension Firestore {
       fatalError("Invalid Firestore Instance")
     }
 
-    return instance
+    return .init(instance)
+  }
+
+  public var settings: FirestoreSettings {
+    get {
+      .init(swift_firebase.swift_cxx_shims.firebase.firestore.firestore_settings(impl))
+    }
+    set {
+      swift_firebase.swift_cxx_shims.firebase.firestore.firestore_set_settings(impl, newValue.impl)
+    }
   }
 
   public func document(_ documentPath: String) -> DocumentReference {
-    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_document(self, std.string(documentPath))
+    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_document(impl, std.string(documentPath))
   }
 
   public func collection(_ collectionPath: String) -> CollectionReference {
-    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_collection(self, std.string(collectionPath))
+    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_collection(impl, std.string(collectionPath))
   }
 
   public func runTransaction(_ updateBlock: @escaping (Transaction, NSErrorPointer) -> Any, completion: @escaping (Any?, Error?) -> Void) {
@@ -55,7 +68,7 @@ extension Firestore {
     let context = TransactionContext(updateBlock: updateBlock)
     let boxed = Unmanaged.passRetained(context as AnyObject)
     let future = swift_firebase.swift_cxx_shims.firebase.firestore.firestore_run_transaction(
-      self, options ?? .init(), { transaction, pErrorMessage, pvUpdateBlock in
+      impl, options ?? .init(), { transaction, pErrorMessage, pvUpdateBlock in
         let context = Unmanaged<AnyObject>.fromOpaque(pvUpdateBlock!).takeUnretainedValue() as! TransactionContext
 
         // Instead of trying to relay the generated `NSError` through firebase's `Error` type
@@ -83,7 +96,7 @@ extension Firestore {
   }
 
   public func batch() -> WriteBatch {
-    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_batch(self)
+    swift_firebase.swift_cxx_shims.firebase.firestore.firestore_batch(impl)
   }
 
   private class TransactionContext {

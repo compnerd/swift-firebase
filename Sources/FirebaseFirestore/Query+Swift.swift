@@ -25,7 +25,7 @@ extension Query: QueryProtocol {
 
 extension QueryProtocol {
   public var firestore: Firestore {
-    swift_firebase.swift_cxx_shims.firebase.firestore.query_firestore(_asQuery)
+    .init(swift_firebase.swift_cxx_shims.firebase.firestore.query_firestore(_asQuery))
   }
 
   // This variant is provided for compatibility with the ObjC API.

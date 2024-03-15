@@ -16,7 +16,7 @@ extension DocumentReference {
   }
 
   public var firestore: Firestore {
-    swift_firebase.swift_cxx_shims.firebase.firestore.document_firestore(self)!
+    .init(swift_firebase.swift_cxx_shims.firebase.firestore.document_firestore(self)!)
   }
 
   public func collection(_ path: String) -> CollectionReference {
