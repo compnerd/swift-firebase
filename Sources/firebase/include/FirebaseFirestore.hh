@@ -26,6 +26,11 @@ firestore_set_settings(::firebase::firestore::Firestore *firestore, ::firebase::
   return firestore->set_settings(settings);
 }
 
+inline VoidFuture
+firestore_clear_persistence(::firebase::firestore::Firestore *firestore) {
+  return VoidFuture::From(firestore->ClearPersistence());
+}
+
 inline ::firebase::firestore::DocumentReference
 firestore_document(::firebase::firestore::Firestore *firestore,
                    const ::std::string &document_path) {
