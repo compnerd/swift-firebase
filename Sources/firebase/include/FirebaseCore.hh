@@ -31,7 +31,7 @@ class SWIFT_CONFORMS_TO_PROTOCOL(FirebaseCore.FutureProtocol)
       _Nonnull FutureCompletionType completion,
       _Nullable void* user_data) const {
     ::firebase::FutureBase::OnCompletion(
-        [completion, user_data](const FutureBase&) {
+        [completion, user_data](const ::firebase::FutureBase&) {
           completion(user_data);
         });
   }
