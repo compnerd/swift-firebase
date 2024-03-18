@@ -31,6 +31,11 @@ firestore_clear_persistence(::firebase::firestore::Firestore *firestore) {
   return VoidFuture::From(firestore->ClearPersistence());
 }
 
+inline VoidFuture
+firestore_terminate(::firebase::firestore::Firestore *firestore) {
+  return VoidFuture::From(firestore->Terminate());
+}
+
 inline ::firebase::firestore::DocumentReference
 firestore_document(::firebase::firestore::Firestore *firestore,
                    const ::std::string &document_path) {
