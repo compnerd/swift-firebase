@@ -44,18 +44,18 @@ public class Firestore {
     }
   }
 
-  public func clearPersistence(completion: (() -> Void)?) {
+  public func clearPersistence(completion: ((Error?) -> Void)?) {
     let future = swift_firebase.swift_cxx_shims.firebase.firestore.firestore_clear_persistence(impl)
     future.setCompletion({
       if let completion {
         DispatchQueue.main.async {
-          completion()
+          completion(nil)
         }
       }
     })
   }
 
-  public func clearPersistence() async {
+  public func clearPersistence() async throws {
     await withCheckedContinuation { continuation in
       let future = swift_firebase.swift_cxx_shims.firebase.firestore.firestore_clear_persistence(impl)
       future.setCompletion({
@@ -64,18 +64,18 @@ public class Firestore {
     }
   }
 
-  public func terminate(completion: (() -> Void)?) {
+  public func terminate(completion: ((Error?) -> Void)?) {
     let future = swift_firebase.swift_cxx_shims.firebase.firestore.firestore_terminate(impl)
     future.setCompletion({
       if let completion {
         DispatchQueue.main.async {
-          completion()
+          completion(nil)
         }
       }
     })
   }
 
-  public func terminate() async {
+  public func terminate() async throws {
     await withCheckedContinuation { continuation in
       let future = swift_firebase.swift_cxx_shims.firebase.firestore.firestore_terminate(impl)
       future.setCompletion({
