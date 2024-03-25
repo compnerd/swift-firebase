@@ -71,6 +71,34 @@ user_send_email_verification(::firebase::auth::User user) {
       user.SendEmailVerification());
 }
 
+inline ::swift_firebase::swift_cxx_shims::firebase::Future<
+    ::firebase::auth::Auth::FetchProvidersResult>
+auth_fetch_providers_for_email(
+    ::firebase::auth::Auth* auth, const char* email) {
+  return auth->FetchProvidersForEmail(email);
+}
+
+inline ::swift_firebase::swift_cxx_shims::firebase::Future<
+    ::firebase::auth::AuthResult>
+auth_sign_in_with_email_and_password(
+    ::firebase::auth::Auth* auth, const char* email, const char* password) {
+  return auth->SignInWithEmailAndPassword(email, password);
+}
+
+inline ::swift_firebase::swift_cxx_shims::firebase::Future<
+    ::firebase::auth::AuthResult>
+auth_create_user_with_email_and_password(
+    ::firebase::auth::Auth* auth, const char* email, const char* password) {
+  return auth->CreateUserWithEmailAndPassword(email, password);
+}
+
+inline ::swift_firebase::swift_cxx_shims::firebase::VoidFuture
+auth_send_password_reset_email(
+    ::firebase::auth::Auth* auth, const char* email) {
+  return ::swift_firebase::swift_cxx_shims::firebase::VoidFuture::From(
+      auth->SendPasswordResetEmail(email));
+}
+
 class SWIFT_UNSAFE_REFERENCE AuthStateListener
     : public ::firebase::auth::AuthStateListener {
   typedef void (*Handler)(::firebase::auth::Auth *auth,
@@ -108,6 +136,7 @@ private:
   Handler block_;
   void *user_data_;
 };
+
 } // namespace swift_firebase::swift_cxx_shims::firebase::auth
 
 #endif

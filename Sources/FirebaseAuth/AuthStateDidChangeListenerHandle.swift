@@ -19,7 +19,7 @@ internal class _AuthStateDidChangeListenerHandle {
     self.listener = swift_firebase.swift_cxx_shims.firebase.auth.AuthStateListener.Create({ auth, user, callback in
       guard let auth else { return }
       if let callback, let body = Unmanaged<AnyObject>.fromOpaque(callback).takeUnretainedValue() as? ((Auth, User?) -> Void) {
-        body(auth, user.pointee.is_valid() ? user.pointee : nil)
+        body(.init(auth), user.pointee.is_valid() ? user.pointee : nil)
       }
     }, UnsafeMutableRawPointer(self.callback.toOpaque()))
   }

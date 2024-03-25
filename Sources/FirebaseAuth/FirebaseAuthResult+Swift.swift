@@ -3,13 +3,18 @@
 @_exported
 import firebase
 
-public typealias AuthDataResult = UnsafeMutablePointer<firebase.auth.AuthResult>
+//public typealias AuthDataResult = UnsafeMutablePointer<firebase.auth.AuthResult>
 
-extension AuthDataResult {
+public final class AuthDataResult {
+  let impl: firebase.auth.AuthResult
+
+  init(_ impl: firebase.auth.AuthResult = .init()) {
+    self.impl = impl
+  }
+
   public var user: User? {
-    let user = self.pointee.user
-    guard user.is_valid() else { return nil }
-    return user
+    guard impl.user.is_valid() else { return nil }
+    return impl.user
   }
 
   // public var additionalUserInfo: AdditionalUserInfo? {
