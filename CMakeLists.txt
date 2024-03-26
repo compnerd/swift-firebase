@@ -25,10 +25,19 @@ target_compile_options(firebase INTERFACE
 target_include_directories(firebase INTERFACE
   Sources/firebase/include
   third_party/firebase-development/usr/include)
-target_link_directories(firebase INTERFACE
-  third_party/firebase-development/usr/libs/windows
-  third_party/firebase-development/usr/libs/windows/deps/app
-  third_party/firebase-development/usr/libs/windows/deps/app/external)
+if(ANDROID)
+  target_link_directories(firebase INTERFACE
+    third_party/firebase-development/usr/libs/android
+    third_party/firebase-development/usr/libs/android/deps/app
+    third_party/firebase-development/usr/libs/android/deps/app/external)
+elseif(WIN32)
+  target_link_directories(firebase INTERFACE
+    third_party/firebase-development/usr/libs/windows
+    third_party/firebase-development/usr/libs/windows/deps/app
+    third_party/firebase-development/usr/libs/windows/deps/app/external)
+else()
+  message(FATAL_ERROR "unsupported firebase-cpp-sdk platform")
+endif()
 
 add_library(FirebaseCore SHARED
   Sources/FirebaseCore/FirebaseApp+Swift.swift
