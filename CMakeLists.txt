@@ -3,6 +3,11 @@
 cmake_minimum_required(VERSION 3.25)
 project(swift-firebase
   LANGUAGES Swift)
+if(ANDROID)
+  enable_language(C)
+  include(FindJava)
+  include(UseJava)
+endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -39,6 +44,10 @@ else()
   message(FATAL_ERROR "unsupported firebase-cpp-sdk platform")
 endif()
 
+if(ANDROID)
+  add_subdirectory(Sources/FirebaseAndroid)
+endif()
+
 add_library(FirebaseCore SHARED
   Sources/FirebaseCore/FirebaseApp+Swift.swift
   Sources/FirebaseCore/FirebaseConfiguration.swift
@@ -55,6 +64,10 @@ target_link_libraries(FirebaseCore PRIVATE
   firebase_app
   flatbuffers
   zlibstatic)
+if(ANDROID)
+  target_link_libraries(FirebaseCore PRIVATE
+    FirebaseAndroidJNI)
+endif()
 
 add_library(FirebaseAuth SHARED
   Sources/FirebaseAuth/AuthStateDidChangeListenerHandle.swift
