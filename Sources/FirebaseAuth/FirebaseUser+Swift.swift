@@ -10,7 +10,6 @@ import FirebaseCore
 
 import CxxShim
 
-public typealias User = firebase.auth.User
 public typealias AuthResult = firebase.auth.AuthResult
 
 public protocol UserInfo {
@@ -23,13 +22,19 @@ public protocol UserInfo {
 }
 
 // TODO(WPP-1581): Improve the API to match the ObjC one better.
-extension User {
+public final class User {
+  let impl: firebase.auth.User
+
+  init(_ impl: firebase.auth.User) {
+    self.impl = impl
+  }
+
   public var isAnonymous: Bool {
-    self.is_anonymous()
+    impl.is_anonymous()
   }
 
   public var isEmailVerified: Bool {
-    self.is_email_verified()
+    impl.is_email_verified()
   }
 
   public var refreshToken: String? {
@@ -68,7 +73,7 @@ extension User {
   //   fatalError("\(#function) not yet implemented")
   // }
 
-  public mutating func reload(completion: ((Error?) -> Void)?) {
+  public func reload(completion: ((Error?) -> Void)?) {
     reloadImpl() { error in
       if let completion {
         DispatchQueue.main.async {
@@ -78,7 +83,7 @@ extension User {
     }
   }
 
-  public mutating func reload() async throws {
+  public func reload() async throws {
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
       reloadImpl() { error in
         if let error {
@@ -90,15 +95,15 @@ extension User {
     }
   }
 
-  private mutating func reloadImpl(completion: @escaping (Error?) -> Void) {
-    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_reload(self)
+  private func reloadImpl(completion: @escaping (Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_reload(impl)
     future.setCompletion({
       let (_, error) = future.resultAndError
       completion(error)
     })
   }
 
-  public mutating func reauthenticate(with credential: Credential, completion: ((AuthResult?, Error?) -> Void)?) {
+  public func reauthenticate(with credential: Credential, completion: ((AuthResult?, Error?) -> Void)?) {
     reauthenticateImpl(with: credential) { result, error in
       if let completion {
         DispatchQueue.main.async {
@@ -108,7 +113,7 @@ extension User {
     }
   }
 
-  public mutating func reauthenticate(with credential: Credential) async throws {
+  public func reauthenticate(with credential: Credential) async throws {
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
       reauthenticateImpl(with: credential) { result, error in
         if let error {
@@ -120,8 +125,8 @@ extension User {
     }
   }
 
-  public mutating func reauthenticateImpl(with credential: Credential, completion: @escaping (AuthResult?, Error?) -> Void) {
-    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_reauthenticate_and_retrieve_data(self, credential)
+  public func reauthenticateImpl(with credential: Credential, completion: @escaping (AuthResult?, Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_reauthenticate_and_retrieve_data(impl, credential)
     future.setCompletion({
       let (result, error) = future.resultAndError
       completion(result, error)
@@ -130,20 +135,20 @@ extension User {
 
   // -reauthenticateWithProvider:UIDelegate:completion:
 
-  public mutating func getIDTokenResult() async throws -> AuthTokenResult {
+  public func getIDTokenResult() async throws -> AuthTokenResult {
     return try await getIDTokenResult(forcingRefresh: false)
   }
 
-  public mutating func getIDTokenResult(forcingRefresh forceRefresh: Bool) async throws
+  public func getIDTokenResult(forcingRefresh forceRefresh: Bool) async throws
       -> AuthTokenResult {
     return try await AuthTokenResult(idTokenForcingRefresh(forceRefresh))
   }
 
-  public mutating func getIDToken() async throws -> String {
+  public func getIDToken() async throws -> String {
     return try await idTokenForcingRefresh(false)
   }
 
-  public mutating func idTokenForcingRefresh(_ forceRefresh: Bool, completion: ((String?, Error?) -> Void)?) {
+  public func idTokenForcingRefresh(_ forceRefresh: Bool, completion: ((String?, Error?) -> Void)?) {
     idTokenForcingRefreshImpl(forceRefresh) { result, error in
       if let completion {
         DispatchQueue.main.async {
@@ -153,7 +158,7 @@ extension User {
     }
   }
 
-  public mutating func idTokenForcingRefresh(_ forceRefresh: Bool) async throws
+  public func idTokenForcingRefresh(_ forceRefresh: Bool) async throws
       -> String {
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, any Error>) in
       idTokenForcingRefreshImpl(forceRefresh) { result, error in
@@ -166,8 +171,8 @@ extension User {
     }
   }
 
-  private mutating func idTokenForcingRefreshImpl(_ forceRefresh: Bool, completion: @escaping (String?, Error?) -> Void) {
-    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_get_token(self, forceRefresh)
+  private func idTokenForcingRefreshImpl(_ forceRefresh: Bool, completion: @escaping (String?, Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_get_token(impl, forceRefresh)
     future.setCompletion({
       let (result, error) = future.resultAndError
       let stringResult: String?
@@ -191,7 +196,7 @@ extension User {
     fatalError("\(#function) not yet implemented")
   }
 
-  public mutating func sendEmailVerification(completion: ((Error?) -> Void)?) {
+  public func sendEmailVerification(completion: ((Error?) -> Void)?) {
     sendEmailVerificationImpl() { error in
       if let completion {
         DispatchQueue.main.async {
@@ -201,7 +206,7 @@ extension User {
     }
   }
 
-  public mutating func sendEmailVerification() async throws {
+  public func sendEmailVerification() async throws {
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
       sendEmailVerificationImpl() { error in
         if let error {
@@ -213,9 +218,8 @@ extension User {
     }
   }
 
-  public mutating func sendEmailVerificationImpl(completion: @escaping (Error?) -> Void) {
-    //let future = self.SendEmailVerification()
-    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_send_email_verification(self)
+  public func sendEmailVerificationImpl(completion: @escaping (Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_send_email_verification(impl)
     future.setCompletion({
       let (_, error) = future.resultAndError
       completion(error)
@@ -242,30 +246,30 @@ extension User {
 
 extension User: UserInfo {
   public var providerID: String {
-    String(swift_firebase.swift_cxx_shims.firebase.auth.user_provider_id(self))
+    String(swift_firebase.swift_cxx_shims.firebase.auth.user_provider_id(impl))
   }
 
   public var uid: String {
-    String(swift_firebase.swift_cxx_shims.firebase.auth.user_uid(self))
+    String(swift_firebase.swift_cxx_shims.firebase.auth.user_uid(impl))
   }
 
   public var displayName: String? {
-    let name = String(swift_firebase.swift_cxx_shims.firebase.auth.user_display_name(self))
+    let name = String(swift_firebase.swift_cxx_shims.firebase.auth.user_display_name(impl))
     return name.isEmpty ? nil : name
   }
 
   public var photoURL: URL? {
-    let url = String(swift_firebase.swift_cxx_shims.firebase.auth.user_photo_url(self))
+    let url = String(swift_firebase.swift_cxx_shims.firebase.auth.user_photo_url(impl))
     return url.isEmpty ? nil : URL(string: url)
   }
 
   public var email: String? {
-    let email = String(swift_firebase.swift_cxx_shims.firebase.auth.user_email(self))
+    let email = String(swift_firebase.swift_cxx_shims.firebase.auth.user_email(impl))
     return email.isEmpty ? nil : email
   }
 
   public var phoneNumber: String? {
-    let number = String(swift_firebase.swift_cxx_shims.firebase.auth.user_phone_number(self))
+    let number = String(swift_firebase.swift_cxx_shims.firebase.auth.user_phone_number(impl))
     return number.isEmpty ? nil : number
   }
 }

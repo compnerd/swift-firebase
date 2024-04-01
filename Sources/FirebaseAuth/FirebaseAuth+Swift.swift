@@ -29,7 +29,7 @@ public final class Auth {
   public var currentUser: User? {
     let user = impl.pointee.current_user()
     guard user.is_valid() else { return nil }
-    return user
+    return .init(user)
   }
 
   public var languageCode: String? {
