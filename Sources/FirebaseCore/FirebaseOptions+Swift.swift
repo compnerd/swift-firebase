@@ -3,6 +3,10 @@
 @_exported
 import firebase
 
+#if os(Android)
+private import FirebaseAndroid
+#endif
+
 import Foundation
 
 public typealias FirebaseOptions = UnsafeMutablePointer<firebase.AppOptions>
@@ -27,7 +31,16 @@ extension firebase.AppOptions: CustomDebugStringConvertible {
 
 extension FirebaseOptions {
   public static func defaultOptions() -> FirebaseOptions {
-    guard let options = firebase.AppOptions.LoadDefault(nil) else {
+#if os(Android)
+    let options =
+        firebase.AppOptions.LoadDefault(nil,
+                                        SwiftFirebase_GetJavaEnvironment(),
+                                        SwiftFirebase_GetActivity())
+#else
+    let options = firebase.AppOptions.LoadDefault(nil)
+#endif
+
+    guard let options else {
       fatalError("unable to deserialise firebase options")
     }
     return options

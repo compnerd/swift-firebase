@@ -3,19 +3,39 @@
 @_exported
 import firebase
 
+#if os(Android)
+private import FirebaseAndroid
+#endif
+
 public typealias FirebaseApp = UnsafeMutablePointer<firebase.App>
 
 extension FirebaseApp {
   public static func configure() {
+#if os(Android)
+    _ = firebase.App.Create(SwiftFirebase_GetJavaEnvironment(),
+                            SwiftFirebase_GetActivity())
+#else
     _ = firebase.App.Create()
+#endif
   }
 
   public static func configure(options: FirebaseOptions) {
+#if os(Android)
+    _ = firebase.App.Create(options.pointee, SwiftFirebase_GetJavaEnvironment(),
+                            SwiftFirebase_GetActivity())
+#else
     _ = firebase.App.Create(options.pointee)
+#endif
   }
 
   public static func configure(name: String, options: FirebaseOptions) {
+#if os(Android)
+    _ = firebase.App.Create(options.pointee, name,
+                            SwiftFirebase_GetJavaEnvironment(),
+                            SwiftFirebase_GetActivity())
+#else
     _ = firebase.App.Create(options.pointee, name)
+#endif
   }
 
   public static func app() -> FirebaseApp? {
