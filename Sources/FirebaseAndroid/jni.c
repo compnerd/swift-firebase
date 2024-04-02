@@ -53,10 +53,10 @@ FIREBASE_ANDROID_ABI
 jint JNI_OnLoad(JavaVM *vm, void *reserved)
 {
   g_VM = vm;
-  if ((*g_VM)->GetEnv(g_VM, (void **)&g_Env, JNI_VERSION_1_6) == JNI_OK)
-    return JNI_VERSION_1_6;
+  if ((*g_VM)->GetEnv(g_VM, (void **)&g_Env, JNI_VERSION_1_6) != JNI_OK)
+    return -1;
   RegisterNativeMethods(g_Env);
-  return -1;
+  return JNI_VERSION_1_6;
 }
 
 FIREBASE_ANDROID_ABI

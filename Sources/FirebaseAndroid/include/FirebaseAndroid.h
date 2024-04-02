@@ -9,9 +9,9 @@
 extern "C" {
 #endif
 
-jobject _Nullable SwiftFirebase_GetActivity(void);
-JNIEnv * _Nullable SwiftFirebase_GetJavaEnvironment(void);
-JavaVM * _Nullable SwiftFirebase_GetJVM(void);
+jobject SwiftFirebase_GetActivity(void);
+JNIEnv *SwiftFirebase_GetJavaEnvironment(void);
+JavaVM *SwiftFirebase_GetJVM(void);
 
 #if defined(__cplusplus)
 }
