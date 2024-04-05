@@ -144,6 +144,10 @@ public final class User {
     return try await AuthTokenResult(idTokenForcingRefresh(forceRefresh))
   }
 
+  public func getIDToken(completion: ((String?, Error?) -> Void)?) {
+    idTokenForcingRefresh(false, completion: completion)
+  }
+
   public func getIDToken() async throws -> String {
     return try await idTokenForcingRefresh(false)
   }
@@ -229,6 +233,10 @@ public final class User {
   // public func sendEmailVerification(with actionCodeSettings: ActionCodeSettings) async throws {
   //   fatalError("\(#function) not yet implemented")
   // }
+
+  public func delete(completion: ((Error?) -> Void)?) {
+    fatalError("\(#function) not yet implemented")
+  }
 
   public func delete() async throws {
     fatalError("\(#function) not yet implemented")

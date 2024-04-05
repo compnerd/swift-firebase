@@ -12,9 +12,8 @@ public final class AuthDataResult {
     self.impl = impl
   }
 
-  public var user: User? {
-    guard impl.user.is_valid() else { return nil }
-    return .init(impl.user)
+  public var user: User {
+    .init(impl.user)
   }
 
   // public var additionalUserInfo: AdditionalUserInfo? {
