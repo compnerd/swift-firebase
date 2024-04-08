@@ -32,7 +32,7 @@ extension QueryProtocol {
   public func getDocuments(source: FirestoreSource = .default, completion: @escaping (QuerySnapshot?, Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(_asQuery, source)
     future.setCompletion({
-      let (snapshot, error) = future.resultAndError
+      let (snapshot, error) = future.resultAndError { FirestoreErrorCode($0) }
       DispatchQueue.main.async {
         completion(snapshot, error)
       }
@@ -43,7 +43,7 @@ extension QueryProtocol {
     try await withCheckedThrowingContinuation { continuation in
       let future = swift_firebase.swift_cxx_shims.firebase.firestore.query_get(_asQuery, source)
       future.setCompletion({
-        let (snapshot, error) = future.resultAndError
+        let (snapshot, error) = future.resultAndError { FirestoreErrorCode($0) }
         if let error {
           continuation.resume(throwing: error)
         } else {

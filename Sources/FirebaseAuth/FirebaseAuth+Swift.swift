@@ -102,7 +102,7 @@ public final class Auth {
   private func fetchSignInMethodsImpl(forEmail email: String, completion: @escaping ([String]?, Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.auth.auth_fetch_providers_for_email(impl, email)
     future.setCompletion({
-      let (result, error) = future.resultAndError
+      let (result, error) = future.resultAndError { AuthErrorCode($0) }
       var providers: [String]?
       if let result {
         providers = result.providers.map(String.init)
@@ -139,7 +139,7 @@ public final class Auth {
   private func signInImpl(withEmail email: String, password: String, completion: @escaping (AuthDataResult?, Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.auth.auth_sign_in_with_email_and_password(impl, email, password)
     future.setCompletion({
-      let (result, error) = future.resultAndError
+      let (result, error) = future.resultAndError { AuthErrorCode($0) }
       var data: AuthDataResult?
       if let result {
         data = .init(result)
@@ -197,7 +197,7 @@ public final class Auth {
   private func createUserImpl(withEmail email: String, password: String, completion: @escaping (AuthDataResult?, Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.auth.auth_create_user_with_email_and_password(impl, email, password)
     future.setCompletion({
-      let (result, error) = future.resultAndError
+      let (result, error) = future.resultAndError { AuthErrorCode($0) }
       var data: AuthDataResult?
       if let result {
         data = .init(result)
@@ -250,7 +250,7 @@ public final class Auth {
   private func sendPasswordResetImpl(withEmail email: String, completion: @escaping (Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.auth.auth_send_password_reset_email(impl, email)
     future.setCompletion({
-      let (_, error) = future.resultAndError
+      let (_, error) = future.resultAndError { AuthErrorCode($0) }
       completion(error)
     })
   }

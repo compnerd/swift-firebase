@@ -98,7 +98,7 @@ public final class User {
   private func reloadImpl(completion: @escaping (Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.auth.user_reload(impl)
     future.setCompletion({
-      let (_, error) = future.resultAndError
+      let (_, error) = future.resultAndError { AuthErrorCode($0) }
       completion(error)
     })
   }
@@ -128,7 +128,7 @@ public final class User {
   public func reauthenticateImpl(with credential: Credential, completion: @escaping (AuthResult?, Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.auth.user_reauthenticate_and_retrieve_data(impl, credential)
     future.setCompletion({
-      let (result, error) = future.resultAndError
+      let (result, error) = future.resultAndError { AuthErrorCode($0) }
       completion(result, error)
     })
   }
@@ -178,7 +178,7 @@ public final class User {
   private func idTokenForcingRefreshImpl(_ forceRefresh: Bool, completion: @escaping (String?, Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.auth.user_get_token(impl, forceRefresh)
     future.setCompletion({
-      let (result, error) = future.resultAndError
+      let (result, error) = future.resultAndError { AuthErrorCode($0) }
       let stringResult: String?
       if let result {
         stringResult = String(result)
@@ -225,7 +225,7 @@ public final class User {
   public func sendEmailVerificationImpl(completion: @escaping (Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.auth.user_send_email_verification(impl)
     future.setCompletion({
-      let (_, error) = future.resultAndError
+      let (_, error) = future.resultAndError { AuthErrorCode($0) }
       completion(error)
     })
   }

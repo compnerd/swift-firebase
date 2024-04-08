@@ -51,7 +51,6 @@ endif()
 add_library(FirebaseCore SHARED
   Sources/FirebaseCore/FirebaseApp+Swift.swift
   Sources/FirebaseCore/FirebaseConfiguration.swift
-  Sources/FirebaseCore/FirebaseError.swift
   Sources/FirebaseCore/FirebaseLogging+Swift.swift
   Sources/FirebaseCore/FirebaseOptions+Swift.swift
   Sources/FirebaseCore/FutureProtocol.swift)

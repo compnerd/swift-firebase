@@ -44,7 +44,7 @@ extension WriteBatch {
   public mutating func commit(completion: @escaping ((Error?) -> Void) = { _ in }) {
     let future = swift_firebase.swift_cxx_shims.firebase.firestore.write_batch_commit(self)
     future.setCompletion({
-      let (_, error) = future.resultAndError
+      let (_, error) = future.resultAndError { FirestoreErrorCode($0) }
       DispatchQueue.main.async {
         completion(error)
       }
@@ -55,7 +55,7 @@ extension WriteBatch {
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
       let future = swift_firebase.swift_cxx_shims.firebase.firestore.write_batch_commit(self)
       future.setCompletion({
-        let (_, error) = future.resultAndError
+        let (_, error) = future.resultAndError { FirestoreErrorCode($0) }
         if let error {
           continuation.resume(throwing: error)
         } else {

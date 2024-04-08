@@ -31,7 +31,7 @@ extension DocumentReference {
   public func getDocument(source: FirestoreSource = .default, completion: @escaping (DocumentSnapshot?, Error?) -> Void) {
     let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_get(self, source)
     future.setCompletion({
-      let (snapshot, error) = future.resultAndError
+      let (snapshot, error) = future.resultAndError { FirestoreErrorCode($0) }
       DispatchQueue.main.async {
         completion(snapshot, error)
       }
@@ -42,7 +42,7 @@ extension DocumentReference {
     try await withCheckedThrowingContinuation { continuation in
       let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_get(self, source)
       future.setCompletion({
-        let (snapshot, error) = future.resultAndError
+        let (snapshot, error) = future.resultAndError { FirestoreErrorCode($0) }
         if let error {
           continuation.resume(throwing: error)
         } else {
@@ -99,7 +99,7 @@ extension DocumentReference {
     let options = merge ? firebase.firestore.SetOptions.Merge() : firebase.firestore.SetOptions()
     let future = swift_firebase.swift_cxx_shims.firebase.firestore.document_set_data(self, converted, options)
     future.setCompletion({
-      let (_, error) = future.resultAndError
+      let (_, error) = future.resultAndError { FirestoreErrorCode($0) }
       completion(error)
     })
   }
