@@ -41,6 +41,20 @@ class SWIFT_CONFORMS_TO_PROTOCOL(FirebaseCore.FutureProtocol)
 // result. Swift is not able to handle a `ResultType` of `void`.
 typedef Future<int> VoidFuture;
 
+// VARIANT support
+
+inline void
+variant_map_insert(::firebase::Variant* variant,
+                   const ::firebase::Variant& key,
+                   const ::firebase::Variant& value) {
+  variant->map()[key] = value;
+}
+
+inline bool
+variant_bool_value(const ::firebase::Variant& variant) {
+  return variant.bool_value(); // Someone was being too cute!
+}
+
 } // namespace swift_firebase::swift_cxx_shims::firebase
 
 #endif

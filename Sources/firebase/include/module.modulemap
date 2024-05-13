@@ -30,4 +30,9 @@ module firebase [system] {
     export *
     link "firebase_firestore"
   }
+
+  module functions {
+    header "FirebaseFunctions.hh"
+    export *
+  }
 }

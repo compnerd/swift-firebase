@@ -53,7 +53,8 @@ add_library(FirebaseCore SHARED
   Sources/FirebaseCore/FirebaseConfiguration.swift
   Sources/FirebaseCore/FirebaseLogging+Swift.swift
   Sources/FirebaseCore/FirebaseOptions+Swift.swift
-  Sources/FirebaseCore/FutureProtocol.swift)
+  Sources/FirebaseCore/FutureProtocol.swift
+  Sources/FirebaseCore/Variant+Swift.swift)
 target_compile_options(FirebaseCore PRIVATE
   -cxx-interoperability-mode=default)
 target_link_libraries(FirebaseCore PUBLIC
@@ -128,9 +129,22 @@ target_link_libraries(FirebaseFirestore PUBLIC
   absl_cordz_functions
   absl_cordz_handle
   absl_cordz_info
+  absl_crc_cord_state
+  absl_crc_cpu_detect
+  absl_crc_internal
+  absl_crc32c
+  absl_flags_commandlineflag_internal
+  absl_flags_commandlineflag
+  absl_flags_config
+  absl_flags_internal
+  absl_flags_marshalling
+  absl_flags_private_handle_accessor
+  absl_flags_program_name
+  absl_flags_reflection
   absl_graphcycles_internal
   absl_hash
   absl_int128
+  absl_kernel_timeout_internal
   absl_low_level_hash
   absl_malloc_internal
   absl_random_internal_platform
@@ -149,6 +163,7 @@ target_link_libraries(FirebaseFirestore PUBLIC
   absl_statusor
   absl_str_format_internal
   absl_strerror
+  absl_string_view
   absl_strings
   absl_strings_internal
   absl_symbolize
@@ -175,7 +190,32 @@ target_link_libraries(FirebaseFirestore PUBLIC
   re2
   snappy
   ssl
-  upb
+  upb_base_lib
+  upb_json_lib
+  upb_mem_lib
+  upb_message_lib
+  upb_textformat_lib
+  utf8_range_lib
+  utf8_validity
+  zlibstatic)
+
+add_library(FirebaseFunctions SHARED
+  Sources/FirebaseFunctions/FirebaseFunctionsErrorCode.swift
+  Sources/FirebaseFunctions/Functions+Swift.swift
+  Sources/FirebaseFunctions/HTTPSCallable+Swift.swift
+  Sources/FirebaseFunctions/HTTPSCallableResult+Swift.swift)
+target_compile_options(FirebaseFunctions PRIVATE
+  -cxx-interoperability-mode=default)
+target_link_libraries(FirebaseFunctions PUBLIC
+  firebase
+  firebase_functions
+  FirebaseCore)
+target_link_libraries(FirebaseFunctions PRIVATE
+  crypto
+  firebase_rest_lib
+  flatbuffers
+  libcurl
+  ssl
   zlibstatic)
 
 if(SWIFT_FIREBASE_BUILD_EXAMPLES)
