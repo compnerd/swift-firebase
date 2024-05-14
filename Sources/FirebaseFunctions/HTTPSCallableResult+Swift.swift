@@ -9,7 +9,7 @@ import CxxShim
 import Foundation
 
 public class HTTPSCallableResult {
-  let data: Any
+  public let data: Any
 
   init(_ result: firebase.functions.HttpsCallableResult = .init()) {
     let variant = swift_firebase.swift_cxx_shims.firebase.functions.https_callable_result_data(result)
