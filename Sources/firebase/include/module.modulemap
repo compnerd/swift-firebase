@@ -35,4 +35,9 @@ module firebase [system] {
     header "FirebaseFunctions.hh"
     export *
   }
+
+  module storage {
+    header "FirebaseStorage.hh"
+    export *
+  }
 }

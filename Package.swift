@@ -28,6 +28,7 @@ let SwiftFirebase =
               .library(name: "FirebaseAuth", targets: ["FirebaseAuth"]),
               .library(name: "FirebaseFirestore", targets: ["FirebaseFirestore"]),
               .library(name: "FirebaseFunctions", targets: ["FirebaseFunctions"]),
+              .library(name: "FirebaseStorage", targets: ["FirebaseStorage"]),
               .executable(name: "FireBaseUI", targets: ["FireBaseUI"]),
             ],
             dependencies: [
@@ -182,6 +183,18 @@ let SwiftFirebase =
                         .linkedLibrary("utf8_validity"),
                       ]),
               .target(name: "FirebaseFunctions",
+                      dependencies: ["firebase", "FirebaseCore"],
+                      cxxSettings: [
+                        .define("INTERNAL_EXPERIMENTAL"),
+                        .define("_CRT_SECURE_NO_WARNINGS",
+                                .when(platforms: [.windows])),
+                        .headerSearchPath("../../third_party/firebase-development/usr/include"),
+                      ],
+                      swiftSettings: [
+                        .interoperabilityMode(.Cxx),
+                        .unsafeFlags(["-Xcc", "-I\(include)"]),
+                      ]),
+              .target(name: "FirebaseStorage",
                       dependencies: ["firebase", "FirebaseCore"],
                       cxxSettings: [
                         .define("INTERNAL_EXPERIMENTAL"),

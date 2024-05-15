@@ -218,6 +218,25 @@ target_link_libraries(FirebaseFunctions PRIVATE
   ssl
   zlibstatic)
 
+add_library(FirebaseStorage SHARED
+  Sources/FirebaseStorage/StorageErrorCode.swift
+  Sources/FirebaseStorage/Storage+Swift.swift
+  Sources/FirebaseStorage/StorageMetadata+Swift.swift
+  Sources/FirebaseStorage/StorageReference+Swift.swift)
+target_compile_options(FirebaseStorage PRIVATE
+  -cxx-interoperability-mode=default)
+target_link_libraries(FirebaseStorage PUBLIC
+  firebase
+  firebase_storage
+  FirebaseCore)
+target_link_libraries(FirebaseStorage PRIVATE
+  crypto
+  firebase_rest_lib
+  flatbuffers
+  libcurl
+  ssl
+  zlibstatic)
+
 if(SWIFT_FIREBASE_BUILD_EXAMPLES)
   FetchContent_Declare(SwiftWin32
     GIT_REPOSITORY https://github.com/compnerd/swift-win32

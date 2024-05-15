@@ -28,7 +28,7 @@ public class HTTPSCallable {
       callImpl(data: data) { result, error in
         if let error {
           continuation.resume(throwing: error)
-        } else{
+        } else {
           continuation.resume(returning: result ?? .init())
         }
       }
