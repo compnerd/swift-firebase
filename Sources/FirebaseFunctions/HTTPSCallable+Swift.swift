@@ -9,9 +9,9 @@ import CxxShim
 import Foundation
 
 public class HTTPSCallable {
-  let impl: firebase.functions.HttpsCallableReference
+  let impl: swift_firebase.swift_cxx_shims.firebase.functions.HttpsCallableRef
 
-  init(_ impl: firebase.functions.HttpsCallableReference) {
+  init(_ impl: swift_firebase.swift_cxx_shims.firebase.functions.HttpsCallableRef) {
     self.impl = impl
   }
 
