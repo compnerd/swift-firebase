@@ -235,11 +235,33 @@ public final class User {
   // }
 
   public func delete(completion: ((Error?) -> Void)?) {
-    fatalError("\(#function) not yet implemented")
+    deleteImpl() { error in
+      if let completion {
+        DispatchQueue.main.async {
+          completion(error)
+        }
+      }
+    }
   }
 
   public func delete() async throws {
-    fatalError("\(#function) not yet implemented")
+    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+      deleteImpl() { error in
+        if let error {
+          continuation.resume(throwing: error)
+        } else {
+          continuation.resume()
+        }
+      }
+    }
+  }
+
+  private func deleteImpl(completion: @escaping (Error?) -> Void) {
+    let future = swift_firebase.swift_cxx_shims.firebase.auth.user_delete(impl)
+    future.setCompletion({
+      let (_, error) = future.resultAndError { AuthErrorCode($0) }
+      completion(error)
+    })
   }
 
   public func sendEmailVerification(beforeUpdatingEmail email: String) async throws {

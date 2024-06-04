@@ -52,6 +52,12 @@ user_reload(::firebase::auth::User user) {
       user.Reload());
 }
 
+inline ::swift_firebase::swift_cxx_shims::firebase::VoidFuture
+user_delete(::firebase::auth::User user) {
+  return ::swift_firebase::swift_cxx_shims::firebase::VoidFuture::From(
+      user.Delete());
+}
+
 inline ::swift_firebase::swift_cxx_shims::firebase::Future<
     ::firebase::auth::AuthResult>
 user_reauthenticate_and_retrieve_data(
