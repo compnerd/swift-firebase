@@ -32,9 +32,7 @@ target_include_directories(firebase INTERFACE
   third_party/firebase-development/usr/include)
 if(ANDROID)
   target_link_directories(firebase INTERFACE
-    third_party/firebase-development/usr/libs/android
-    third_party/firebase-development/usr/libs/android/deps/app
-    third_party/firebase-development/usr/libs/android/deps/app/external)
+    third_party/firebase-development/usr/libs/android/${CMAKE_ANDROID_ARCH_ABI})
 elseif(WIN32)
   target_link_directories(firebase INTERFACE
     third_party/firebase-development/usr/libs/windows
