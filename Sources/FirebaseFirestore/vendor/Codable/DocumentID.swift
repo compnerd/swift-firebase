@@ -41,9 +41,7 @@ extension String: DocumentIDWrappable {
 
 extension DocumentReference: DocumentIDWrappable {
   public static func wrap(_ documentReference: DocumentReference) throws -> Self {
-    // Swift complains that values of type DocumentReference cannot be returned
-    // as Self which is nonsensical. The cast forces this to work.
-    return documentReference as! Self
+    return documentReference
   }
 }
 

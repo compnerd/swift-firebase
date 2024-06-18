@@ -108,8 +108,8 @@ internal struct FirestoreDataConverter {
       }
 
       return firebase.firestore.FieldValue.Map(map)
-    case is firebase.firestore.FieldValue:
-      return field as! firebase.firestore.FieldValue
+    case let field as firebase.firestore.FieldValue:
+      return field
     default:
       return nil
     }
