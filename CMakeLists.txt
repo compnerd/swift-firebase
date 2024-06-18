@@ -60,10 +60,10 @@ target_compile_options(FirebaseCore PRIVATE
 target_link_libraries(FirebaseCore PUBLIC
   firebase)
 target_link_libraries(FirebaseCore PRIVATE
-  libcurl
   firebase_app
   flatbuffers
-  zlibstatic)
+  $<$<PLATFORM_ID:Windows>:libcurl>
+  $<$<PLATFORM_ID:Windows>:zlibstatic>)
 if(ANDROID)
   target_link_libraries(FirebaseCore PRIVATE
     FirebaseAndroidJNI)
@@ -87,9 +87,9 @@ target_link_libraries(FirebaseAuth PRIVATE
   crypto
   firebase_rest_lib
   flatbuffers
-  libcurl
   ssl
-  zlibstatic)
+  $<$<PLATFORM_ID:Windows>:libcurl>
+  $<$<PLATFORM_ID:Windows>:zlibstatic>)
 
 add_library(FirebaseFirestore SHARED
   Sources/FirebaseFirestore/Vendor/Codable/CodableErrors.swift
@@ -185,7 +185,6 @@ target_link_libraries(FirebaseFirestore PUBLIC
   grpc
   grpc++
   leveldb
-  libcurl
   protobuf-nanopb
   re2
   snappy
@@ -197,7 +196,8 @@ target_link_libraries(FirebaseFirestore PUBLIC
   upb_textformat_lib
   utf8_range_lib
   utf8_validity
-  zlibstatic)
+  $<$<PLATFORM_ID:Windows>:libcurl>
+  $<$<PLATFORM_ID:Windows>:zlibstatic>)
 
 add_library(FirebaseFunctions SHARED
   Sources/FirebaseFunctions/FunctionsErrorCode.swift
@@ -214,9 +214,9 @@ target_link_libraries(FirebaseFunctions PRIVATE
   crypto
   firebase_rest_lib
   flatbuffers
-  libcurl
   ssl
-  zlibstatic)
+  $<$<PLATFORM_ID:Windows>:libcurl>
+  $<$<PLATFORM_ID:Windows>:zlibstatic>)
 
 add_library(FirebaseStorage SHARED
   Sources/FirebaseStorage/StorageErrorCode.swift
@@ -233,9 +233,9 @@ target_link_libraries(FirebaseStorage PRIVATE
   crypto
   firebase_rest_lib
   flatbuffers
-  libcurl
   ssl
-  zlibstatic)
+  $<$<PLATFORM_ID:Windows>:libcurl>
+  $<$<PLATFORM_ID:Windows>:zlibstatic>)
 
 if(SWIFT_FIREBASE_BUILD_EXAMPLES)
   FetchContent_Declare(SwiftWin32
