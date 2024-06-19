@@ -63,7 +63,7 @@ target_link_libraries(FirebaseCore PRIVATE
   $<$<PLATFORM_ID:Windows>:libcurl>
   $<$<PLATFORM_ID:Windows>:zlibstatic>)
 if(ANDROID)
-  target_link_libraries(FirebaseCore PRIVATE
+  target_link_libraries(FirebaseCore PUBLIC
     FirebaseAndroidJNI)
 endif()
 
