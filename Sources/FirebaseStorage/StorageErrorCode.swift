@@ -30,7 +30,7 @@ extension StorageErrorCode: RawRepresentable {
 
 extension StorageErrorCode {
   init(_ error: firebase.storage.Error, errorMessage: String?) {
-    self.init((code: error.rawValue, message: errorMessage ?? "\(error.rawValue)"))
+    self.init((code: numericCast(error.rawValue), message: errorMessage ?? "\(error.rawValue)"))
   }
 
   init?(_ error: firebase.storage.Error?, errorMessage: UnsafePointer<CChar>?) {
