@@ -82,11 +82,11 @@ target_link_libraries(FirebaseAuth PUBLIC
   firebase
   FirebaseCore)
 target_link_libraries(FirebaseAuth PRIVATE
-  crypto
-  firebase_rest_lib
   flatbuffers
-  ssl
+  $<$<PLATFORM_ID:Windows>:crypto>
+  $<$<PLATFORM_ID:Windows>:firebase_rest_lib>
   $<$<PLATFORM_ID:Windows>:libcurl>
+  $<$<PLATFORM_ID:Windows>:ssl>
   $<$<PLATFORM_ID:Windows>:zlibstatic>)
 
 add_library(FirebaseFirestore SHARED
