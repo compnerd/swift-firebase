@@ -35,6 +35,21 @@ class SWIFT_CONFORMS_TO_PROTOCOL(FirebaseCore.FutureProtocol)
           completion(user_data);
         });
   }
+
+  // FIXME: Remove once https://github.com/apple/swift/issues/74578 is fixed.
+#if defined(SR74578)
+  int error() const {
+    return ::firebase::Future<R>::error();
+  }
+
+  const R *result() const {
+    return ::firebase::Future<R>::result();
+  }
+
+  const char *error_message() const {
+    return ::firebase::Future<R>::error_message();
+  }
+#endif
 };
 
 // As a workaround, use `int` here instead of `void` for futures with no

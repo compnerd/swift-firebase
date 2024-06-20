@@ -25,7 +25,7 @@ include_directories(SYSTEM ${_SWIFT_INCLUDE_DIR}/include)
 
 add_library(firebase INTERFACE)
 target_compile_options(firebase INTERFACE
-  "SHELL:$<$<COMPILE_LANGUAGE:Swift>:-Xcc -DSR69711>"
+  "SHELL:$<$<COMPILE_LANGUAGE:Swift>:-Xcc -DSR69711 -Xcc -DSR74578>"
   "SHELL:$<$<COMPILE_LANGUAGE:Swift>:-Xcc -DINTERNAL_EXPERIMENTAL>")
 target_include_directories(firebase INTERFACE
   Sources/firebase/include
