@@ -60,6 +60,7 @@ target_link_libraries(FirebaseCore PUBLIC
 target_link_libraries(FirebaseCore PRIVATE
   firebase_app
   flatbuffers
+  $<$<PLATFORM_ID:ANDROID>:log>
   $<$<PLATFORM_ID:Windows>:libcurl>
   $<$<PLATFORM_ID:Windows>:zlibstatic>)
 if(ANDROID)
