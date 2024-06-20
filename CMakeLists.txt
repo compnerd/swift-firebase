@@ -33,6 +33,26 @@ target_include_directories(firebase INTERFACE
 if(ANDROID)
   target_link_directories(firebase INTERFACE
     third_party/firebase-development/usr/libs/android/${CMAKE_ANDROID_ARCH_ABI})
+
+  # Add the compiler resource directory as a library search path explicitly as
+  # we do not use `clang` from the NDK but do require `libunwind.a` which is not
+  # in the sysroot (platform SDK) but rather placed into the resource directory
+  # on the Android platform.
+  if(CMAKE_ANDROID_ARCH STREQUAL arm64)
+    target_link_directories(firebase INTERFACE
+      $ENV{ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/windows-x86_64/lib/clang/17/lib/linux/aarch64)
+  elseif(CMAKE_ANDROID_ARCH STREQUAL arm)
+    target_link_directories(firebase INTERFACE
+      $ENV{ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/windows-x86_64/lib/clang/17/lib/linux/arm)
+  elseif(CMAKE_ANDROID_ARCH STREQUAL x86)
+    target_link_directories(firebase INTERFACE
+      $ENV{ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/windows-x86_64/lib/clang/17/lib/linux/i386)
+  elseif(CMAKE_ANDROID_ARCH STREQUAL x86_64)
+    target_link_directories(firebase INTERFACE
+      $ENV{ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/windows-x86_64/lib/clang/17/lib/linux/x86_64)
+  else()
+    message(SEND_ERROR "unsupported architecture for Android")
+  endif()
 elseif(WIN32)
   target_link_directories(firebase INTERFACE
     third_party/firebase-development/usr/libs/windows
