@@ -30,7 +30,7 @@ extension FirestoreErrorCode: RawRepresentable {
 
 extension FirestoreErrorCode {
   init(_ error: firebase.firestore.Error, errorMessage: String?) {
-    self.init((code: error.rawValue, message: errorMessage ?? "\(error.rawValue)"))
+    self.init((code: numericCast(error.rawValue), message: errorMessage ?? "\(error.rawValue)"))
   }
 
   init?(_ error: firebase.firestore.Error?, errorMessage: UnsafePointer<CChar>?) {

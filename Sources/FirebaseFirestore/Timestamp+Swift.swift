@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 import Foundation
+#if os(Windows)
 import WinSDK
 import CRT
+#endif
 
 public typealias Timestamp = firebase.Timestamp
 private let NanoSecondsPerSecond = 1_000_000_000
