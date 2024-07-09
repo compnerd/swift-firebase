@@ -18,7 +18,7 @@ jobs:
             tag: DEVELOPMENT-SNAPSHOT-2024-02-08-a
             options: -Xswiftc "-I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include"
 
-    name: SPM - Swift ${{ matrix.tag }}
+    name: SPM (Windows) - Swift ${{ matrix.tag }}
 
     steps:
       - uses: compnerd/gha-setup-swift@main
@@ -31,10 +31,12 @@ jobs:
       - uses: dsaltares/fetch-gh-release-asset@a40c8b4a0471f9ab81bdf73a010f74cc51476ad4 # v1.1.1
         with:
           repo: thebrowsercompany/firebase-cpp-sdk
-          version: tags/20240511.0
+          version: tags/20240909.0
           file: firebase-windows-amd64.zip
 
-      - run: Expand-Archive -Path firebase-windows-amd64.zip -DestinationPath third_party; Rename-Item -Path third_party/firebase -NewName firebase-development
+      - run: |
+          Expand-Archive -Path firebase-windows-amd64.zip -DestinationPath third_party
+          Rename-Item -Path third_party/firebase-windows-amd64 -NewName firebase-development
         shell: powershell
 
       - name: Build
@@ -51,7 +53,7 @@ jobs:
             tag: DEVELOPMENT-SNAPSHOT-2024-02-08-a
             options: -I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include
 
-    name: CMake - Swift ${{ matrix.tag }}
+    name: CMake (Windows) - Swift ${{ matrix.tag }}
 
     steps:
       - uses: compnerd/gha-setup-vsdevenv@main
@@ -66,14 +68,103 @@ jobs:
       - uses: dsaltares/fetch-gh-release-asset@a40c8b4a0471f9ab81bdf73a010f74cc51476ad4 # v1.1.1
         with:
           repo: thebrowsercompany/firebase-cpp-sdk
-          version: tags/20240511.0
+          version: tags/20240909.0
           file: firebase-windows-amd64.zip
 
-      - run: Expand-Archive -Path firebase-windows-amd64.zip -DestinationPath third_party; Rename-Item -Path third_party/firebase -NewName firebase-development
+      - run: |
+          Expand-Archive -Path firebase-windows-amd64.zip -DestinationPath third_party
+          Rename-Item -Path third_party/firebase-windows-amd64 -NewName firebase-development
         shell: powershell
 
       - name: Configure
-        run: cmake -B out -D CMAKE_BUILD_TYPE=Release -G Ninja -S ${{ github.workspace }} -D CMAKE_Swift_FLAGS="${{ matrix.options }}" -D SWIFT_FIREBASE_BUILD_EXAMPLES=NO
+        run: |
+          cmake -B out `
+                -D CMAKE_BUILD_TYPE=Release `
+                -G Ninja `
+                -S ${{ github.workspace }} `
+                -D CMAKE_Swift_FLAGS="${{ matrix.options }}" `
+                -D SWIFT_FIREBASE_BUILD_EXAMPLES=NO
+
+      - name: Build
+        run: cmake --build out
+
+  android:
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - branch: development
+            tag: DEVELOPMENT-SNAPSHOT-2024-08-02-a
+
+            abi: arm64-v8a
+            options: -sdk ${env:SDKROOT}..\..\..\..\Android.platform\Developer\SDKs\Android.sdk -sysroot ${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\sysroot -I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include -I${env:SDKROOT}\usr\include -Xlinker -zdefs
+            target: aarch64-unknown-linux-android28
+
+          - branch: development
+            tag: DEVELOPMENT-SNAPSHOT-2024-08-02-a
+
+            abi: x86_64
+            options: -sdk ${env:SDKROOT}..\..\..\..\Android.platform\Developer\SDKs\Android.sdk -sysroot ${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\sysroot -I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include -I${env:SDKROOT}\usr\include -Xlinker -zdefs
+            target: x86_64-unknown-linux-android28
+
+    name: CMake (Android) - Swift ${{ matrix.tag }}
+
+    steps:
+      - uses: compnerd/gha-setup-vsdevenv@main
+
+      - uses: compnerd/gha-setup-swift@main
+        with:
+          # tag: ${{ matrix.tag }}
+          # branch: ${{ atrix.branch }}
+          github-repo: thebrowsercompany/swift-build
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          release-asset-name: installer-amd64.exe
+          release-tag-name: "20240909.3"
+
+      - uses: actions/checkout@v4
+
+      - uses: dsaltares/fetch-gh-release-asset@a40c8b4a0471f9ab81bdf73a010f74cc51476ad4 # v1.1.1
+        with:
+          repo: thebrowsercompany/firebase-cpp-sdk
+          version: tags/20240909.0
+          file: firebase-android-${{ matrix.abi }}.zip
+
+      - run: |
+          Expand-Archive -Path firebase-android-${{ matrix.abi }}.zip -DestinationPath third_party
+          Rename-Item -Path third_party/firebase-android-${{ matrix.abi}} -NewName firebase-development
+        shell: powershell
+
+      - uses: nttld/setup-ndk@afb4c9964b521afb97c864b7d40b11e6911bd410 # v1.5.0
+        id: setup-ndk
+        with:
+          ndk-version: r26d
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - uses: android-actions/setup-android@00854ea68c109d98c75d956347303bf7c45b0277 # v3.2.1
+        with:
+          packages: 'platforms;android-21'
+
+      - name: Configure
+        env:
+          ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        run: |
+          cmake -B out `
+                -D CMAKE_BUILD_TYPE=RelWithDebInfo `
+                -G Ninja `
+                -S ${{ github.workspace }} `
+                -D CMAKE_SYSTEM_NAME=Android `
+                -D CMAKE_ANDROID_ARCH_ABI=${{ matrix.abi }} `
+                -D CMAKE_ANDROID_API=21 `
+                -D CMAKE_Swift_COMPILER_TARGET=${{ matrix.target }} `
+                -D CMAKE_Swift_COMPILER_WORKS=YES `
+                -D CMAKE_Swift_FLAGS="${{ matrix.options }}" `
+                -D SWIFT_FIREBASE_BUILD_EXAMPLES=NO
 
       - name: Build
         run: cmake --build out
