@@ -46,7 +46,7 @@ RegisterNativeMethods(JNIEnv *env)
     LOG_ERROR("JVM.RegisterNatives(%s): %u", kClassPath, result);
     return;
   }
-  LOG_DEBUG("registered %u methods", N_ELEMENTS(kMethods));
+  LOG_DEBUG("registered %lu methods", N_ELEMENTS(kMethods));
 }
 
 FIREBASE_ANDROID_ABI
