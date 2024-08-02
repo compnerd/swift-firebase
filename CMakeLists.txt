@@ -6,6 +6,7 @@ project(swift-firebase
 if(ANDROID)
   enable_language(C)
   include(FindJava)
+  include(FindJNI)
   include(UseJava)
 endif()
 

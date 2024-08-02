@@ -5,7 +5,8 @@ add_library(FirebaseAndroidJNI SHARED
 target_include_directories(FirebaseAndroidJNI PUBLIC
   include)
 target_link_libraries(FirebaseAndroidJNI PRIVATE
-  log)
+  log
+  JNI::JNI)
 
 add_jar(SwiftFirebase
           Native.java
