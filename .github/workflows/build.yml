@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           - branch: development
-            tag: DEVELOPMENT-SNAPSHOT-2024-02-08-a
+            tag: DEVELOPMENT-SNAPSHOT-2025-11-03-a
             options: -Xswiftc "-I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include"
 
     name: SPM (Windows) - Swift ${{ matrix.tag }}
