@@ -49,8 +49,7 @@ extension Timestamp: Codable {
 
 extension Date {
   internal func firestoreTimestamp() -> Timestamp {
-    var secondsDouble: Double = 0.0
-    var fraction = modf(timeIntervalSince1970, &secondsDouble)
+    var (secondsDouble, fraction) = modf(timeIntervalSince1970)
 
     // Re-implementation of https://github.com/firebase/firebase-ios-sdk/blob/master/Firestore/Source/API/FIRTimestamp.m#L50
     if (fraction < 0) {

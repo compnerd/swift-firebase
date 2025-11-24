@@ -208,6 +208,7 @@ let SwiftFirebase =
                       ]),
               .executableTarget(name: "FireBaseUI",
                                 dependencies: [
+                                  "firebase",
                                   "FirebaseCore",
                                   "FirebaseAuth",
                                   "FirebaseFirestore",
@@ -219,6 +220,7 @@ let SwiftFirebase =
                                 cxxSettings: [
                                   .define("INTERNAL_EXPERIMENTAL"),
                                   .define("_CRT_SECURE_NO_WARNINGS", .when(platforms: [.windows])),
+                                  .headerSearchPath("../../third_party/firebase-development/usr/include"),
                                 ],
                                 swiftSettings: [
                                   .interoperabilityMode(.Cxx),
