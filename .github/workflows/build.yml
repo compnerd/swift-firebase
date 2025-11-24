@@ -14,17 +14,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - branch: development
-            tag: DEVELOPMENT-SNAPSHOT-2024-02-08-a
+          - swift_development_build: DEVELOPMENT-SNAPSHOT-2025-09-21-a
             options: -Xswiftc "-I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include"
 
-    name: SPM (Windows) - Swift ${{ matrix.tag }}
+    name: SPM (Windows) - Swift ${{ matrix.swift_release_tag_name }}
 
     steps:
       - uses: compnerd/gha-setup-swift@main
         with:
-          tag: ${{ matrix.tag }}
-          branch: ${{ matrix.branch }}
+          swift-version: development
+          swift-build: ${{ matrix.swift_development_build }}
 
       - uses: actions/checkout@v4
 
@@ -49,19 +48,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - branch: development
-            tag: DEVELOPMENT-SNAPSHOT-2024-02-08-a
+          - swift_development_build: DEVELOPMENT-SNAPSHOT-2025-09-21-a
             options: -I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include
 
-    name: CMake (Windows) - Swift ${{ matrix.tag }}
+    name: CMake (Windows) - Swift ${{ matrix.swift_release_tag_name }}
 
     steps:
       - uses: compnerd/gha-setup-vsdevenv@main
 
       - uses: compnerd/gha-setup-swift@main
         with:
-          tag: ${{ matrix.tag }}
-          branch: ${{ matrix.branch }}
+          swift-version: development
+          swift-build: ${{ matrix.swift_development_build }}
 
       - uses: actions/checkout@v4
 
@@ -94,34 +92,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # TODO: Remove the following workaround from `options`, due to missing `libclang_rt.builtins.a`
+        #       and `libunwind.a` libraries in the Swift toolchain:
+        #       -Xclang-linker -resource-dir -Xclang-linker ${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\lib\clang\18
         include:
-          - branch: development
-            tag: DEVELOPMENT-SNAPSHOT-2024-08-02-a
-
+          - swift_development_build: DEVELOPMENT-SNAPSHOT-2025-11-03-a
             abi: arm64-v8a
-            options: -sdk ${env:SDKROOT}..\..\..\..\Android.platform\Developer\SDKs\Android.sdk -sysroot ${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\sysroot -I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include -I${env:SDKROOT}\usr\include -Xlinker -zdefs
+            options: -sdk ${env:SDKROOT}..\..\..\..\Android.platform\Developer\SDKs\Android.sdk -sysroot ${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\sysroot -Xclang-linker -resource-dir -Xclang-linker ${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\lib\clang\18 -I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include -I${env:SDKROOT}\usr\include -Xlinker -zdefs
             target: aarch64-unknown-linux-android28
 
-          - branch: development
-            tag: DEVELOPMENT-SNAPSHOT-2024-08-02-a
-
+          - swift_development_build: DEVELOPMENT-SNAPSHOT-2025-11-03-a
             abi: x86_64
-            options: -sdk ${env:SDKROOT}..\..\..\..\Android.platform\Developer\SDKs\Android.sdk -sysroot ${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\sysroot -I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include -I${env:SDKROOT}\usr\include -Xlinker -zdefs
+            options: -sdk ${env:SDKROOT}..\..\..\..\Android.platform\Developer\SDKs\Android.sdk -sysroot ${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\sysroot -Xclang-linker -resource-dir -Xclang-linker ${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\lib\clang\18 -I${env:SDKROOT}\..\..\..\..\..\..\Toolchains\0.0.0+Asserts\usr\include -I${env:SDKROOT}\usr\include -Xlinker -zdefs
             target: x86_64-unknown-linux-android28
 
-    name: CMake (Android) - Swift ${{ matrix.tag }}
+    name: CMake (Android) - Swift ${{ matrix.swift_release_tag_name }} ${{ matrix.abi }}
 
     steps:
       - uses: compnerd/gha-setup-vsdevenv@main
 
       - uses: compnerd/gha-setup-swift@main
         with:
-          # tag: ${{ matrix.tag }}
-          # branch: ${{ atrix.branch }}
-          github-repo: thebrowsercompany/swift-build
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          release-asset-name: installer-amd64.exe
-          release-tag-name: "20240909.3"
+          swift-version: development
+          swift-build: ${{ matrix.swift_development_build }}
 
       - uses: actions/checkout@v4
 
@@ -139,7 +132,7 @@ jobs:
       - uses: nttld/setup-ndk@afb4c9964b521afb97c864b7d40b11e6911bd410 # v1.5.0
         id: setup-ndk
         with:
-          ndk-version: r26d
+          ndk-version: r27c
 
       - uses: actions/setup-java@v4
         with:
@@ -148,7 +141,17 @@ jobs:
 
       - uses: android-actions/setup-android@00854ea68c109d98c75d956347303bf7c45b0277 # v3.2.1
         with:
-          packages: 'platforms;android-21'
+          packages: 'platforms;android-28'
+
+      # TODO: Remove the workaround step below, due to `std::__voidify()` not being accessible
+      #       with the current combination of Swift toolchain and Andoird NDK versions.
+      - name: Patch out private symbol std::__voidify() in construct_at.h
+        env:
+          ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        run: |
+          $construct_at_h_path="${env:ANDROID_NDK_ROOT}\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\c++\v1\__memory\construct_at.h"
+          (Get-Content $construct_at_h_path) -replace "std::__voidify","(void *) &" | Set-Content $construct_at_h_path
+        shell: powershell
 
       - name: Configure
         env:
@@ -160,7 +163,7 @@ jobs:
                 -S ${{ github.workspace }} `
                 -D CMAKE_SYSTEM_NAME=Android `
                 -D CMAKE_ANDROID_ARCH_ABI=${{ matrix.abi }} `
-                -D CMAKE_ANDROID_API=21 `
+                -D CMAKE_ANDROID_API=28 `
                 -D CMAKE_Swift_COMPILER_TARGET=${{ matrix.target }} `
                 -D CMAKE_Swift_COMPILER_WORKS=YES `
                 -D CMAKE_Swift_FLAGS="${{ matrix.options }}" `
